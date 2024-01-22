@@ -51,6 +51,11 @@ target_compile_definitions(DDSHelloWorldExampleSharedMem PRIVATE
     $<$<AND:$<NOT:$<BOOL:${WIN32}>>,$<STREQUAL:"${CMAKE_BUILD_TYPE}","Debug">>:__DEBUG>
     $<$<BOOL:${INTERNAL_DEBUG}>:__INTERNALDEBUG> # Internal debug activated.
     )
-target_link_libraries(DDSHelloWorldExampleSharedMem fastrtps fastcdr foonathan_memory)
-install(TARGETS DDSHelloWorldExampleSharedMem
+
+target_include_directories(DDSHelloWorldExampleSharedMem PRIVATE 
+/home/teresa/AmiShare/ReplicatingPeer/src/objc/libBoxOSStore/TST)
+target_link_libraries(DDSHelloWorldExampleSharedMem fastrtps fastcdr foonathan_memory 
+/home/teresa/AmiShare/lib/Linux/x86_64-ubuntu-22_04/libBoxOSStoreOBC.so.0)
+
+install(TARGETS DDSHelloWorldExampleSharedMem 
     RUNTIME DESTINATION examples/cpp/dds/HelloWorldExampleSharedMem/${BIN_INSTALL_DIR})

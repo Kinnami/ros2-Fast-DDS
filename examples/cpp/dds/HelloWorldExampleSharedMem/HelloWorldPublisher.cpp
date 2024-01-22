@@ -58,6 +58,7 @@ bool HelloWorldPublisher::init()
 
     auto shm_transport = std::make_shared<SharedMemTransportDescriptor>();
     shm_transport->segment_size(2 * 1024 * 1024);
+    shm_transport->rtps_dump_file("/home/teresa/shared-mem-dump.txt");
     pqos.transport().user_transports.push_back(shm_transport);
 
     participant_ = DomainParticipantFactory::get_instance()->create_participant(0, pqos);

@@ -456,7 +456,7 @@ set_target_properties(${PROJECT_NAME} PROPERTIES
 
 option(INTERNAL_DEBUG "Activate developer debug messages" OFF)
 
-target_compile_definitions(${PROJECT_NAME}
+target_compile_definitions(${PROJECT_NAME} 
     PRIVATE
     ${PROJECT_NAME_UPPER}_SOURCE
     BOOST_ASIO_STANDALONE
@@ -492,6 +492,7 @@ target_include_directories(${PROJECT_NAME} PUBLIC
     $<$<BOOL:${ANDROID}>:${ANDROID_IFADDRS_INCLUDE_DIR}>
     ${THIRDPARTY_BOOST_INCLUDE_DIR}
     ${PROJECT_SOURCE_DIR}/thirdparty/taocpp-pegtl
+    /home/teresa/AmiShare/ReplicatingPeer/src/objc/libBoxOSStore/TST
     )
 
 # No need to expose linked libs when target is a shared library on MSVC.
@@ -509,6 +510,7 @@ target_link_libraries(${PROJECT_NAME} ${PRIVACY} fastcdr foonathan_memory
     $<$<BOOL:${WIN32}>:iphlpapi$<SEMICOLON>Shlwapi>
     ${THIRDPARTY_BOOST_LINK_LIBS}
     PRIVATE eProsima_atomic
+    /home/teresa/AmiShare/lib/Linux/x86_64-ubuntu-22_04/libBoxOSStoreOBC.so.0
     )
 
 if(MSVC OR MSVC_IDE)
