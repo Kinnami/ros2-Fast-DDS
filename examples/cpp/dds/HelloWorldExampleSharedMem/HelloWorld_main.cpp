@@ -24,7 +24,7 @@
 #include <fastrtps/Domain.h>
 #include <fastrtps/log/Log.h>
 
-// #include "BoxTSTTestObjectCreate.h"
+#include "BoxTSTObjectCreate.h"
 
 using namespace eprosima;
 using namespace fastrtps;
