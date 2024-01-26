@@ -186,6 +186,12 @@ DataWriterImpl::DataWriterImpl(
         is_custom_payload_pool_ = true;
         payload_pool_ = payload_pool;
     }
+    std::cout << "TEBD: starting object create init in data writer\n";
+    m_poObjectCreate = new void*;
+    *m_poObjectCreate = NULL;
+    object_create_init(m_poObjectCreate);
+    m_iCount = 0;
+    std::cout << "TEBD: finished object create init in data writer\n";
 }
 
 DataWriterImpl::DataWriterImpl(
@@ -215,6 +221,12 @@ DataWriterImpl::DataWriterImpl(
     , lifespan_duration_us_(qos_.lifespan().duration.to_ns() * 1e-3)
 {
     guid_ = { publisher_->get_participant_impl()->guid().guidPrefix, entity_id};
+    std::cout << "TEBD: starting object create init in data writer\n";
+    m_poObjectCreate = new void*;
+    *m_poObjectCreate = NULL;
+    object_create_init(m_poObjectCreate);
+    m_iCount = 0;
+    std::cout << "TEBD: finished object create init in data writer\n";
 }
 
 ReturnCode_t DataWriterImpl::enable()
@@ -585,6 +597,17 @@ ReturnCode_t DataWriterImpl::discard_loan(
 bool DataWriterImpl::write(
         void* data)
 {
+
+    /*
+    std::cout << "TEBD: starting object create in data writer\n";
+    const char** args;
+    args = new const char*[2];
+    args[0] = "/testdatawriter";
+    //args[1] = "This is a test file in the write function!\n";
+    args[1] = data->message()->c_str();
+    object_create(m_poObjectCreate, 2, args);
+    std::cout << "TEBD: finished object create in data writer\n";
+    */
     if (writer_ == nullptr)
     {
         return false;
@@ -960,6 +983,24 @@ ReturnCode_t DataWriterImpl::perform_create_new_change(
 #endif // if HAVE_STRICT_REALTIME
 
     PayloadInfo_t payload;
+
+    std::cout << "TEBD: starting object create in data writer\n";
+    std::cout << "Topic name? " << getTopicName() << "\n";
+    type_->serialize(data, &payload.payload);
+    //std::cout << "TEBD: data? " << payload.payload.data << "\n";
+    std::cout << "TEBD: length? " << payload.payload.length << "\n";
+    const char** args;
+    args = new const char*[2];
+    std::string file = "/" + getTopicName() + std::to_string(m_iCount++);
+    args[0] = file.c_str();
+
+    //std::string strdata = (std::string)(const char *)payload.payload.data + " " + std::to_string(payload.payload.length);
+    std::string strdata = "Hello, this is the test file\n";
+    args[1] = strdata.c_str();
+
+    object_create(m_poObjectCreate, 2, args);
+    std::cout << "TEBD: finished object create in data writer\n";
+
     bool was_loaned = check_and_remove_loan(data, payload);
     if (!was_loaned)
     {
@@ -974,6 +1015,22 @@ ReturnCode_t DataWriterImpl::perform_create_new_change(
             return_payload_to_pool(payload);
             return ReturnCode_t::RETCODE_ERROR;
         }
+            /*
+        else
+        {
+            std::cout << "TEBD: starting object create in data writer\n";
+            const char** args;
+            args = new const char*[2];
+            std::string file = "/testdatawriter" + std::to_string(m_iCount++);
+            args[0] = file.c_str();
+            //args[1] = (const char*)payload.payload.data;
+            args[1] = "This is a test file in the write function!\n";
+            std::cout << "TEBD: data? " << payload.payload.data << "\n";
+            std::cout << "TEBD: length? " << payload.payload.length << "\n";
+            object_create(m_poObjectCreate, 2, args);
+            std::cout << "TEBD: finished object create in data writer\n";
+        }
+            */
     }
 
     CacheChange_t* ch = writer_->new_change(change_kind, handle);
@@ -2204,6 +2261,12 @@ bool DataWriterImpl::is_relevant(
     const DataWriterFilteredChange& writer_change = static_cast<const DataWriterFilteredChange&>(change);
     return writer_change.is_relevant_for(reader_guid);
 }
+
+std::string DataWriterImpl::getTopicName()
+{
+    return topic_->get_impl()->get_rtps_topic_name();
+}
+
 
 } // namespace dds
 } // namespace fastdds

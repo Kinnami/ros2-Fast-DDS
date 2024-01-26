@@ -50,6 +50,8 @@
 #include <rtps/history/ITopicPayloadPool.h>
 #include <rtps/DataSharing/DataSharingPayloadPool.hpp>
 
+#include "BoxTSTObjectCreate.h"
+
 using eprosima::fastrtps::types::ReturnCode_t;
 
 namespace eprosima {
@@ -389,6 +391,9 @@ public:
     void filter_is_being_removed(
             const char* filter_class_name);
 
+
+    std::string getTopicName();
+
 protected:
 
     using IChangePool = eprosima::fastrtps::rtps::IChangePool;
@@ -412,6 +417,9 @@ protected:
 
     //!History
     DataWriterHistory history_;
+
+    void ** m_poObjectCreate;
+    int m_iCount;
 
     //!Listener to capture the events of the Writer
     class InnerDataWriterListener : public fastrtps::rtps::WriterListener

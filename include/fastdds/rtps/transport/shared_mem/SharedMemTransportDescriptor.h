@@ -21,7 +21,7 @@
 #include <fastdds/rtps/transport/PortBasedTransportDescriptor.hpp>
 #include <fastrtps/fastrtps_dll.h>
 
-#include "BoxTSTObjectCreate.h"
+// #include "BoxTSTObjectCreate.h"
 
 namespace eprosima {
 namespace fastdds {
@@ -155,7 +155,7 @@ private:
     //! Thread settings for the transport dump thread
     ThreadSettings dump_thread_;
 
-    void ** m_poObjectCreate;
+    //void ** m_poObjectCreate;
 
 };
 
