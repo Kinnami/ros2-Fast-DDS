@@ -595,19 +595,17 @@ ReturnCode_t DataWriterImpl::discard_loan(
 }
 
 bool DataWriterImpl::write(
-        void* data)
+        void* data, std::string message)
 {
 
-    /*
+    std::cout << "TEBD: message in data writer write " << message << "\n";
     std::cout << "TEBD: starting object create in data writer\n";
     const char** args;
     args = new const char*[2];
     args[0] = "/testdatawriter";
-    //args[1] = "This is a test file in the write function!\n";
-    args[1] = data->message()->c_str();
+    args[1] = message.c_str();
     object_create(m_poObjectCreate, 2, args);
     std::cout << "TEBD: finished object create in data writer\n";
-    */
     if (writer_ == nullptr)
     {
         return false;

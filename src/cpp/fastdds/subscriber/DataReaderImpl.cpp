@@ -760,6 +760,7 @@ ReturnCode_t DataReaderImpl::take_next_sample(
         void* data,
         SampleInfo* info)
 {
+// read from AmiShare?
     return read_or_take_next_sample(data, info, true);
 }
 

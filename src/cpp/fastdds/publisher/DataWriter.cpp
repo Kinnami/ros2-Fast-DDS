@@ -79,9 +79,9 @@ ReturnCode_t DataWriter::discard_loan(
 }
 
 bool DataWriter::write(
-        void* data)
+        void* data, std::string message)
 {
-    return impl_->write(data);
+    return impl_->write(data, message);
 }
 
 bool DataWriter::write(

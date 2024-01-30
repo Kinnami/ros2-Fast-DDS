@@ -23,6 +23,8 @@
 #include <fastdds/rtps/transport/shared_mem/SharedMemTransportDescriptor.h>
 #include <fastdds/rtps/transport/UDPv4TransportDescriptor.h>
 
+#include <fastdds/rtps/common/SerializedPayload.h>
+
 #include <thread>
 
 using namespace eprosima::fastdds::dds;
@@ -209,7 +211,16 @@ bool HelloWorldPublisher::publish(
         std::string s = "BigData" + std::to_string(hello_->index() % 10);
         strcpy(&hello_->data()[data_size - s.length() - 1], s.c_str());
 
-        writer_->write(hello_.get());
+        SerializedPayload_t payload;
+        type_->serialize(hello_.get(), &payload);
+        std::cout << "Payload length: " << payload.length << "\n";
+        //std::cout << "Payload data: " << payload.data << "\n";
+
+        std::cout << "TEBD: writing\n";
+        std::cout << "Message: " << hello_->message() << "\n";
+        std::cout << "Index: " << hello_->index() << "\n";
+        //std::cout << "Data end: " << (char*)&hello_->data()[1000000] << "\n";
+        writer_->write(hello_.get(), hello_->message());
 
         return true;
     }

@@ -178,7 +178,7 @@ public:
      * @return true if data is correctly delivered to the lower layers, false otherwise.
      */
     bool write(
-            void* data);
+            void* data, std::string message);
 
     /**
      * Write data with params to the topic.
