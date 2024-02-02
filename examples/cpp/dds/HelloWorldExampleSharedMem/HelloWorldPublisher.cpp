@@ -220,7 +220,8 @@ bool HelloWorldPublisher::publish(
         std::cout << "Message: " << hello_->message() << "\n";
         std::cout << "Index: " << hello_->index() << "\n";
         //std::cout << "Data end: " << (char*)&hello_->data()[1000000] << "\n";
-        writer_->write(hello_.get(), hello_->message());
+        std::string message = hello_->message() + " " + std::to_string(hello_->index());
+        writer_->write(hello_.get(), message);
 
         return true;
     }

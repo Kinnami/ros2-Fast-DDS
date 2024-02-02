@@ -51,6 +51,8 @@
 
 #include <fastdds/subscriber/history/DataReaderHistory.hpp>
 
+#include "BoxTSTObjectCreate.h"
+
 namespace eprosima {
 namespace fastrtps {
 namespace rtps {
@@ -190,7 +192,8 @@ public:
 
     ReturnCode_t take_next_sample(
             void* data,
-            SampleInfo* info);
+            SampleInfo* info,
+            std::string &message);
 
     ///@}
 
@@ -379,6 +382,8 @@ public:
 
     std::recursive_mutex& get_conditions_mutex() const noexcept;
 
+    std::string getTopicName();
+
 protected:
 
     //!Subscriber
@@ -391,6 +396,9 @@ protected:
     TypeSupport type_;
 
     TopicDescription* topic_ = nullptr;
+
+    void ** m_poObjectCreate;
+    int m_iCount;
 
     DataReaderQos qos_;
 

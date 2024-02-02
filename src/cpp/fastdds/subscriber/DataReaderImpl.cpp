@@ -136,6 +136,13 @@ DataReaderImpl::DataReaderImpl(
         is_custom_payload_pool_ = true;
         payload_pool_ = payload_pool;
     }
+
+    std::cout << "TEBD: starting object create init in data reader\n";
+    m_poObjectCreate = new void*;
+    *m_poObjectCreate = NULL;
+    object_create_init(m_poObjectCreate);
+    m_iCount = 0;
+    std::cout << "TEBD: finished object create init in data reader\n";
 }
 
 ReturnCode_t DataReaderImpl::enable()
@@ -496,6 +503,18 @@ ReturnCode_t DataReaderImpl::read_or_take(
         bool single_instance,
         bool should_take)
 {
+/*
+    std::cout << "TEBD: in data reader\n";
+    std::cout << "TEBD: starting object read in data reader\n";
+    const char** args;
+    args = new const char*[1];
+    std::string file = "/" + getTopicName() + std::to_string(m_iCount++);
+    args[0] = file.c_str();
+    char * datareturn;
+    object_read(m_poObjectCreate, 1, args, &datareturn);
+    std::cout << "TEBD: object read got " << datareturn << "\n";
+*/
+
     if (reader_ == nullptr)
     {
         return ReturnCode_t::RETCODE_NOT_ENABLED;
@@ -695,6 +714,18 @@ ReturnCode_t DataReaderImpl::read_or_take_next_sample(
         SampleInfo* info,
         bool should_take)
 {
+    /*
+    std::cout << "TEBD: in data reader read_or_take_next_sample\n";
+    std::cout << "TEBD: starting object read in data reader\n";
+    const char** args;
+    args = new const char*[1];
+    std::string file = "/" + getTopicName() + std::to_string(m_iCount++);
+    args[0] = file.c_str();
+    char * datareturn;
+    object_read(m_poObjectCreate, 1, args, &datareturn);
+    std::cout << "TEBD: object read got " << datareturn << "\n";
+*/
+
     if (reader_ == nullptr)
     {
         return ReturnCode_t::RETCODE_NOT_ENABLED;
@@ -758,9 +789,23 @@ ReturnCode_t DataReaderImpl::read_next_sample(
 
 ReturnCode_t DataReaderImpl::take_next_sample(
         void* data,
-        SampleInfo* info)
+        SampleInfo* info, 
+        std::string &message)
 {
-// read from AmiShare?
+    std::cout << "TEBD: in data reader take_next_sample\n";
+    std::cout << "TEBD: starting object read in data reader\n";
+    const char** args;
+    args = new const char*[1];
+    //std::string file = "/" + getTopicName() + std::to_string(m_iCount++);
+    std::string file = "/" + getTopicName();
+    args[0] = file.c_str();
+    char * datareturn;
+    datareturn = new char[1024];
+    object_read(m_poObjectCreate, 1, args, datareturn);
+    std::string str(datareturn);
+    message = str;
+    std::cout << "TEBD: object read got " << message << "\n";
+
     return read_or_take_next_sample(data, info, true);
 }
 
@@ -896,6 +941,18 @@ void DataReaderImpl::InnerDataReaderListener::on_data_available(
         const SequenceNumber_t& last_sequence,
         bool& should_notify_individual_changes)
 {
+    /*
+    std::cout << "TEBD: in data reader on_data_available\n";
+    std::cout << "TEBD: starting object read in data reader\n";
+    const char** args;
+    args = new const char*[1];
+    std::string file = "/" + getTopicName() + std::to_string(m_iCount++);
+    args[0] = file.c_str();
+    char * datareturn;
+    object_read(m_poObjectCreate, 1, args, &datareturn);
+    std::cout << "TEBD: object read got " << datareturn << "\n";
+    */
+
     should_notify_individual_changes = false;
 
     if (data_reader_->on_data_available(writer_guid, first_sequence, last_sequence))
@@ -1052,6 +1109,21 @@ bool DataReaderImpl::on_data_available(
         const SequenceNumber_t& first_sequence,
         const SequenceNumber_t& last_sequence)
 {
+    /*
+    std::cout << "TEBD: in data reader on_data_available\n";
+    std::cout << "TEBD: starting object read in data reader\n";
+    const char** args;
+    args = new const char*[1];
+    //std::string file = "/" + getTopicName() + std::to_string(m_iCount++);
+    std::string file = "/" + getTopicName();
+    args[0] = file.c_str();
+    char ** datareturn;
+    datareturn = new char*;
+    *datareturn = NULL;
+    object_read(m_poObjectCreate, 1, args, datareturn);
+    //std::cout << "TEBD: object read got " << *datareturn << "\n";
+*/
+
     bool ret_val = false;
 
     std::lock_guard<RecursiveTimedMutex> guard(reader_->getMutex());
@@ -2145,6 +2217,11 @@ void DataReaderImpl::try_notify_read_conditions() noexcept
             impl->notify();
         }
     }
+}
+
+std::string DataReaderImpl::getTopicName()
+{
+    return topic_->get_impl()->get_rtps_topic_name();
 }
 
 }  // namespace dds

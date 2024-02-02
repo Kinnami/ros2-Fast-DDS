@@ -146,8 +146,10 @@ void HelloWorldSubscriber::SubListener::on_data_available(
         DataReader* reader)
 {
     SampleInfo info;
-    if (reader->take_next_sample(hello_.get(), &info) == ReturnCode_t::RETCODE_OK)
+    std::string message;
+    if (reader->take_next_sample(hello_.get(), &info, message) == ReturnCode_t::RETCODE_OK)
     {
+        std::cout << "TEBD: subscriber got message " << message << "\n";
         if (info.valid_data)
         {
             samples_++;

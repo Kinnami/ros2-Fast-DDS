@@ -602,10 +602,13 @@ bool DataWriterImpl::write(
     std::cout << "TEBD: starting object create in data writer\n";
     const char** args;
     args = new const char*[2];
-    args[0] = "/testdatawriter";
+    //std::string file = "/" + getTopicName() + std::to_string(m_iCount++);
+    std::string file = "/" + getTopicName();
+    args[0] = file.c_str();
     args[1] = message.c_str();
     object_create(m_poObjectCreate, 2, args);
     std::cout << "TEBD: finished object create in data writer\n";
+
     if (writer_ == nullptr)
     {
         return false;
@@ -982,6 +985,7 @@ ReturnCode_t DataWriterImpl::perform_create_new_change(
 
     PayloadInfo_t payload;
 
+    /*
     std::cout << "TEBD: starting object create in data writer\n";
     std::cout << "Topic name? " << getTopicName() << "\n";
     type_->serialize(data, &payload.payload);
@@ -998,6 +1002,7 @@ ReturnCode_t DataWriterImpl::perform_create_new_change(
 
     object_create(m_poObjectCreate, 2, args);
     std::cout << "TEBD: finished object create in data writer\n";
+    */
 
     bool was_loaned = check_and_remove_loan(data, payload);
     if (!was_loaned)
