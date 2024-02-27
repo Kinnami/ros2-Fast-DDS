@@ -804,7 +804,7 @@ ReturnCode_t DataReaderImpl::take_next_sample(
     object_read(m_poObjectCreate, 1, args, datareturn);
     std::string str(datareturn);
     message = str;
-    std::cout << "TEBD: object read got " << message << "\n";
+    std::cout << "TEBD: object read got " << datareturn << "\n";
 
     return read_or_take_next_sample(data, info, true);
 }

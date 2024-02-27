@@ -190,6 +190,15 @@ DataWriterImpl::DataWriterImpl(
     m_poObjectCreate = new void*;
     *m_poObjectCreate = NULL;
     object_create_init(m_poObjectCreate);
+
+    const char** args;
+    args = new const char*[2];
+    std::string file = "/" + getTopicName();
+    std::string message = "";
+    args[0] = file.c_str();
+    args[1] = message.c_str();
+    object_create(m_poObjectCreate, 2, args);
+
     m_iCount = 0;
     std::cout << "TEBD: finished object create init in data writer\n";
 }
@@ -225,6 +234,15 @@ DataWriterImpl::DataWriterImpl(
     m_poObjectCreate = new void*;
     *m_poObjectCreate = NULL;
     object_create_init(m_poObjectCreate);
+
+    const char** args;
+    args = new const char*[2];
+    std::string file = "/" + getTopicName();
+    std::string message = "";
+    args[0] = file.c_str();
+    args[1] = message.c_str();
+    object_create(m_poObjectCreate, 2, args);
+
     m_iCount = 0;
     std::cout << "TEBD: finished object create init in data writer\n";
 }
@@ -606,7 +624,7 @@ bool DataWriterImpl::write(
     std::string file = "/" + getTopicName();
     args[0] = file.c_str();
     args[1] = message.c_str();
-    object_create(m_poObjectCreate, 2, args);
+    object_update(m_poObjectCreate, 2, args);
     std::cout << "TEBD: finished object create in data writer\n";
 
     if (writer_ == nullptr)
