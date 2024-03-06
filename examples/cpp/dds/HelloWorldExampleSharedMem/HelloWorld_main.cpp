@@ -47,7 +47,7 @@ int main(
 
     std::cout << "Starting " << std::endl;
     int type = 1;
-    int count = 10;
+    int count = 5;
     long sleep = 100;
     if (argc > 1)
     {

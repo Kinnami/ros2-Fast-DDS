@@ -221,7 +221,21 @@ bool HelloWorldPublisher::publish(
         std::cout << "Index: " << hello_->index() << "\n";
         //std::cout << "Data end: " << (char*)&hello_->data()[1000000] << "\n";
         std::string message = hello_->message() + " " + std::to_string(hello_->index());
-        writer_->write(hello_.get(), message);
+
+        //writer_->write(hello_.get(), message);
+        std::shared_ptr<HelloWorld> notify;
+        notify = std::make_shared<HelloWorld>();
+        notify->index(0);
+        notify->message(" ");
+
+        char buf[8192];
+        eprosima::fastcdr::FastBuffer buffer(buf, 8192);
+        eprosima::fastcdr::Cdr message_cdr(buffer, eprosima::fastcdr::Cdr::DEFAULT_ENDIAN, eprosima::fastcdr::CdrVersion::DDS_CDR);
+        hello_->serialize(message_cdr);
+
+        std::cout << "TEBD: hello world publisher has buffer " << buf << "\n";
+
+        writer_->write(notify.get(), message, buf);
 
         return true;
     }

@@ -172,7 +172,7 @@ std::string& HelloWorld::message()
  * @param _data New value to be copied in member data
  */
 void HelloWorld::data(
-        const std::array<char, 1024*1024>& _data)
+        const std::array<char, 1024>& _data)
 {
     m_data = _data;
 }
@@ -182,7 +182,7 @@ void HelloWorld::data(
  * @param _data New value to be moved in member data
  */
 void HelloWorld::data(
-        std::array<char, 1024*1024>&& _data)
+        std::array<char, 1024>&& _data)
 {
     m_data = std::move(_data);
 }
@@ -191,7 +191,7 @@ void HelloWorld::data(
  * @brief This function returns a constant reference to member data
  * @return Constant reference to member data
  */
-const std::array<char, 1024*1024>& HelloWorld::data() const
+const std::array<char, 1024>& HelloWorld::data() const
 {
     return m_data;
 }
@@ -200,7 +200,7 @@ const std::array<char, 1024*1024>& HelloWorld::data() const
  * @brief This function returns a reference to member data
  * @return Reference to member data
  */
-std::array<char, 1024*1024>& HelloWorld::data()
+std::array<char, 1024>& HelloWorld::data()
 {
     return m_data;
 }
