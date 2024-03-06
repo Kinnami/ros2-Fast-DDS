@@ -165,7 +165,7 @@ ReturnCode_t DomainParticipantImpl::enable_statistics_datawriter(
                 const void* data_sample = nullptr;
                 data_sample = &notification;
 
-                data_writer->write(const_cast<void*>(data_sample), "");
+                data_writer->write(const_cast<void*>(data_sample), "", NULL);
             }
             else
             {

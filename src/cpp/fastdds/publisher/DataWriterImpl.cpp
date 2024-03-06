@@ -613,7 +613,7 @@ ReturnCode_t DataWriterImpl::discard_loan(
 }
 
 bool DataWriterImpl::write(
-        void* data, std::string message)
+        void* data, std::string message, char* buffer)
 {
 
     std::cout << "TEBD: message in data writer write " << message << "\n";
@@ -623,7 +623,8 @@ bool DataWriterImpl::write(
     //std::string file = "/" + getTopicName() + std::to_string(m_iCount++);
     std::string file = "/" + getTopicName();
     args[0] = file.c_str();
-    args[1] = message.c_str();
+    //args[1] = message.c_str();
+    args[1] = (char *)buffer;
     object_update(m_poObjectCreate, 2, args);
     std::cout << "TEBD: finished object create in data writer\n";
 
