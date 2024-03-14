@@ -774,18 +774,23 @@ ReturnCode_t DataReaderImpl::take_next_sample(
     //std::string file = "/" + getTopicName() + std::to_string(m_iCount++);
     std::string file = "/" + getTopicName();
     args[0] = file.c_str();
-    char * datareturn;
-    datareturn = new char[8192];
-    object_read(m_poObjectCreate, 1, args, datareturn);
+    unsigned char ** datareturn;
+    datareturn = new unsigned char *;
+    int datareturnsize;
+    object_read(m_poObjectCreate, 1, args, datareturn, &datareturnsize);
+    //int object_read(void** a_poObjectCreate, const int a_iArgC, const char * a_apszArgV[], BYTE ** a_pbReturn, int* a_iReturnSize)
 
-    eprosima::fastcdr::FastBuffer buffer(datareturn, 8192);
-    eprosima::fastcdr::Cdr datareturn_cdr(buffer, eprosima::fastcdr::Cdr::DEFAULT_ENDIAN, eprosima::fastcdr::CdrVersion::DDS_CDR);
-    datareturn_cdr.serialize(datareturn);
+    //eprosima::fastcdr::FastBuffer buffer(*datareturn, datareturnsize);
+    //eprosima::fastcdr::Cdr datareturn_cdr(buffer, eprosima::fastcdr::Cdr::DEFAULT_ENDIAN, eprosima::fastcdr::CdrVersion::DDS_CDR);
+    //datareturn_cdr.serialize(*datareturn);
     //data = const_cast<void*>(datareturn);
 
-    std::string str(datareturn);
+    std::string str(reinterpret_cast<char*>(*datareturn),  datareturnsize);
     message = str;
-    std::cout << "TEBD: object read got " << datareturn << "\n";
+    std::cout << "TEBD: object read got " << str << "\n";
+    delete[] args;
+    free(*datareturn); // might need to free this
+    delete datareturn;
 
     return read_or_take_next_sample(data, info, true);
 }

@@ -623,10 +623,11 @@ bool DataWriterImpl::write(
     //std::string file = "/" + getTopicName() + std::to_string(m_iCount++);
     std::string file = "/" + getTopicName();
     args[0] = file.c_str();
-    //args[1] = message.c_str();
-    args[1] = (char *)buffer;
+    args[1] = message.c_str();
+    //args[1] = (char *)buffer;
     object_update(m_poObjectCreate, 2, args);
     std::cout << "TEBD: finished object create in data writer\n";
+    delete[] args;
 
     if (writer_ == nullptr)
     {
