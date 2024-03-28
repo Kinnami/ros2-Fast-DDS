@@ -228,14 +228,21 @@ bool HelloWorldPublisher::publish(
         notify->index(0);
         notify->message(" ");
 
-        char buf[8192];
-        eprosima::fastcdr::FastBuffer buffer(buf, 8192);
+        char *buf;
+        int length;
+        length = hello_->getMaxCdrSerializedSize();
+        std::cout << "TEBD: max size is " << length << "\n";
+        buf = new char[length];
+        eprosima::fastcdr::FastBuffer buffer(buf, length);
         eprosima::fastcdr::Cdr message_cdr(buffer, eprosima::fastcdr::Cdr::DEFAULT_ENDIAN, eprosima::fastcdr::CdrVersion::DDS_CDR);
         hello_->serialize(message_cdr);
+        length = HelloWorld::getCdrSerializedSize(*hello_);
+        std::cout << "TEBD: actual size is " << length << "\n";
 
         std::cout << "TEBD: hello world publisher has buffer " << buf << "\n";
 
-        writer_->write(notify.get(), message, buf);
+        writer_->write(notify.get(), message, reinterpret_cast<unsigned char*>(buf), length);
+        delete[] buf;
 
         return true;
     }

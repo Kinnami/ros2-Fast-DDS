@@ -710,6 +710,8 @@ public:
     RTPS_DllAPI ReturnCode_t take_next_sample(
             void* data,
             SampleInfo* info, 
+            unsigned char **datareturn,
+            int &datareturnsize,
             std::string &message);
 
     ///@}

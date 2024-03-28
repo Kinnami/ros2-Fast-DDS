@@ -766,6 +766,8 @@ ReturnCode_t DataReaderImpl::read_next_sample(
 ReturnCode_t DataReaderImpl::take_next_sample(
         void* data,
         SampleInfo* info, 
+        unsigned char **datareturn,
+        int &datareturnsize,
         std::string &message)
 {
     std::cout << "TEBD: starting object read in data reader\n";
@@ -774,9 +776,9 @@ ReturnCode_t DataReaderImpl::take_next_sample(
     //std::string file = "/" + getTopicName() + std::to_string(m_iCount++);
     std::string file = "/" + getTopicName();
     args[0] = file.c_str();
-    unsigned char ** datareturn;
+    //unsigned char ** datareturn;
     datareturn = new unsigned char *;
-    int datareturnsize;
+    //int datareturnsize;
     object_read(m_poObjectCreate, 1, args, datareturn, &datareturnsize);
     //int object_read(void** a_poObjectCreate, const int a_iArgC, const char * a_apszArgV[], BYTE ** a_pbReturn, int* a_iReturnSize)
 
@@ -789,10 +791,11 @@ ReturnCode_t DataReaderImpl::take_next_sample(
     message = str;
     std::cout << "TEBD: object read got " << str << "\n";
     delete[] args;
-    free(*datareturn); // might need to free this
-    delete datareturn;
+    free(*datareturn); // caller needs to free this?
+    delete datareturn; 
 
     return read_or_take_next_sample(data, info, true);
+    //return ReturnCode_t::RETCODE_OK;
 }
 
 ReturnCode_t DataReaderImpl::get_first_untaken_info(

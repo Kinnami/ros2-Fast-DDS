@@ -147,9 +147,12 @@ void HelloWorldSubscriber::SubListener::on_data_available(
 {
     SampleInfo info;
     std::string message;
-    if (reader->take_next_sample(hello_.get(), &info, message) == ReturnCode_t::RETCODE_OK)
+    unsigned char **datareturn;
+    int datareturnsize;
+    if (reader->take_next_sample(hello_.get(), &info, datareturn, datareturnsize, message) == ReturnCode_t::RETCODE_OK)
     {
-        std::cout << "TEBD: subscriber got message " << message << "\n";
+        //std::string str(reinterpret_cast<char*>(*datareturn), datareturnsize);
+        //std::cout << "TEBD: subscriber got message " << str << "\n";
         if (info.valid_data)
         {
             samples_++;
@@ -160,6 +163,8 @@ void HelloWorldSubscriber::SubListener::on_data_available(
                       << (char*)&hello_->data()[data_size - 9] << std::endl;
         }
     }
+    //free(*datareturn); 
+    //delete datareturn;
 }
 
 void HelloWorldSubscriber::run()

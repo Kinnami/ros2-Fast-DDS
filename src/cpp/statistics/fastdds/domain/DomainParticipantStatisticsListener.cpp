@@ -111,7 +111,7 @@ void DomainParticipantStatisticsListener::on_statistics_data(
                 break;
         }
 
-        writer->write(const_cast<void*>(data_sample), "", NULL);
+        writer->write(const_cast<void*>(data_sample), "", NULL, 0);
     }
 }
 

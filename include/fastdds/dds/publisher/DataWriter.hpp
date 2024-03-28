@@ -138,7 +138,7 @@ public:
      * @return True if correct, false otherwise
      */
     RTPS_DllAPI bool write(
-            void* data, std::string message, char* buffer);
+            void* data, std::string message, unsigned char* buffer, int length);
 
     /**
      * Write data with params to the topic.

@@ -191,6 +191,7 @@ DataWriterImpl::DataWriterImpl(
     *m_poObjectCreate = NULL;
     object_create_init(m_poObjectCreate);
 
+    /*
     const char** args;
     args = new const char*[2];
     std::string file = "/" + getTopicName();
@@ -198,6 +199,7 @@ DataWriterImpl::DataWriterImpl(
     args[0] = file.c_str();
     args[1] = message.c_str();
     object_create(m_poObjectCreate, 2, args);
+    */
 
     m_iCount = 0;
     std::cout << "TEBD: finished object create init in data writer\n";
@@ -235,6 +237,7 @@ DataWriterImpl::DataWriterImpl(
     *m_poObjectCreate = NULL;
     object_create_init(m_poObjectCreate);
 
+    /*
     const char** args;
     args = new const char*[2];
     std::string file = "/" + getTopicName();
@@ -242,6 +245,7 @@ DataWriterImpl::DataWriterImpl(
     args[0] = file.c_str();
     args[1] = message.c_str();
     object_create(m_poObjectCreate, 2, args);
+    */
 
     m_iCount = 0;
     std::cout << "TEBD: finished object create init in data writer\n";
@@ -613,7 +617,7 @@ ReturnCode_t DataWriterImpl::discard_loan(
 }
 
 bool DataWriterImpl::write(
-        void* data, std::string message, char* buffer)
+        void* data, std::string message, unsigned char* buffer, int length)
 {
 
     std::cout << "TEBD: message in data writer write " << message << "\n";
@@ -623,8 +627,9 @@ bool DataWriterImpl::write(
     //std::string file = "/" + getTopicName() + std::to_string(m_iCount++);
     std::string file = "/" + getTopicName();
     args[0] = file.c_str();
-    args[1] = message.c_str();
-    //args[1] = (char *)buffer;
+    //args[1] = message.c_str();
+    std::string buf(reinterpret_cast<char const*>(buffer), length);
+    args[1] = buf.c_str();
     object_update(m_poObjectCreate, 2, args);
     std::cout << "TEBD: finished object create in data writer\n";
     delete[] args;

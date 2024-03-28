@@ -268,9 +268,11 @@ ReturnCode_t DataReader::read_next_sample(
 ReturnCode_t DataReader::take_next_sample(
         void* data,
         SampleInfo* info, 
+        unsigned char **datareturn,
+        int &datareturnsize,
         std::string &message)
 {
-    return impl_->take_next_sample(data, info, message);
+    return impl_->take_next_sample(data, info, datareturn, datareturnsize, message);
 }
 
 ReturnCode_t DataReader::get_first_untaken_info(
