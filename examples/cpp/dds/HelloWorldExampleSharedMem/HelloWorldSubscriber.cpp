@@ -148,11 +148,22 @@ void HelloWorldSubscriber::SubListener::on_data_available(
     SampleInfo info;
     std::string message;
     unsigned char **datareturn;
+    datareturn = new unsigned char*;
     int datareturnsize;
     if (reader->take_next_sample(hello_.get(), &info, datareturn, datareturnsize, message) == ReturnCode_t::RETCODE_OK)
     {
         //std::string str(reinterpret_cast<char*>(*datareturn), datareturnsize);
         //std::cout << "TEBD: subscriber got message " << str << "\n";
+        eprosima::fastcdr::FastBuffer buffer(reinterpret_cast<char*>(*datareturn), datareturnsize);
+        eprosima::fastcdr::Cdr datareturn_cdr(buffer, eprosima::fastcdr::Cdr::DEFAULT_ENDIAN, eprosima::fastcdr::CdrVersion::DDS_CDR);
+        hello_->deserialize(datareturn_cdr);
+
+            const size_t data_size = hello_->data().size();
+            // Print your structure data here.
+            std::cout << "Message " << hello_->message() << " " << hello_->index()
+                      << " RECEIVED With " << data_size << "(bytes) of Data. DataEnd = "
+                      << (char*)&hello_->data()[data_size - 9] << std::endl;
+        /*
         if (info.valid_data)
         {
             samples_++;
@@ -162,9 +173,10 @@ void HelloWorldSubscriber::SubListener::on_data_available(
                       << " RECEIVED With " << data_size << "(bytes) of Data. DataEnd = "
                       << (char*)&hello_->data()[data_size - 9] << std::endl;
         }
+        */
     }
-    //free(*datareturn); 
-    //delete datareturn;
+    free(*datareturn); // allocated by object_read
+    delete datareturn;
 }
 
 void HelloWorldSubscriber::run()

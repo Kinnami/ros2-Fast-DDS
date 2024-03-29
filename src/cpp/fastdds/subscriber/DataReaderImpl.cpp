@@ -777,7 +777,7 @@ ReturnCode_t DataReaderImpl::take_next_sample(
     std::string file = "/" + getTopicName();
     args[0] = file.c_str();
     //unsigned char ** datareturn;
-    datareturn = new unsigned char *;
+    //datareturn = new unsigned char *;
     //int datareturnsize;
     object_read(m_poObjectCreate, 1, args, datareturn, &datareturnsize);
     //int object_read(void** a_poObjectCreate, const int a_iArgC, const char * a_apszArgV[], BYTE ** a_pbReturn, int* a_iReturnSize)
@@ -791,8 +791,8 @@ ReturnCode_t DataReaderImpl::take_next_sample(
     message = str;
     std::cout << "TEBD: object read got " << str << "\n";
     delete[] args;
-    free(*datareturn); // caller needs to free this?
-    delete datareturn; 
+    //free(*datareturn); // caller needs to free this?
+    //delete datareturn; 
 
     return read_or_take_next_sample(data, info, true);
     //return ReturnCode_t::RETCODE_OK;
