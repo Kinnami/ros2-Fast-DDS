@@ -623,14 +623,17 @@ bool DataWriterImpl::write(
     std::cout << "TEBD: message in data writer write " << message << "\n";
     std::cout << "TEBD: starting object create in data writer\n";
     const char** args;
-    args = new const char*[2];
+    args = new const char*[3];
     //std::string file = "/" + getTopicName() + std::to_string(m_iCount++);
     std::string file = "/" + getTopicName();
     args[0] = file.c_str();
     //args[1] = message.c_str();
+    std::cout << "TEBD: writing buffer with length " << length << "\n";
     std::string buf(reinterpret_cast<char const*>(buffer), length);
     args[1] = buf.c_str();
-    object_update(m_poObjectCreate, 2, args);
+    std::string len = std::to_string(length);
+    args[2] = len.c_str();
+    object_update(m_poObjectCreate, 3, args);
     std::cout << "TEBD: finished object create in data writer\n";
     delete[] args;
 
