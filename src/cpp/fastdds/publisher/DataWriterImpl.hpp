@@ -180,6 +180,8 @@ public:
     bool write(
             void* data, std::string message, unsigned char* buffer, int length);
 
+    bool amishare_write(void* data);
+
     /**
      * Write data with params to the topic.
      *

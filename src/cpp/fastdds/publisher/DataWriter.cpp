@@ -78,6 +78,11 @@ ReturnCode_t DataWriter::discard_loan(
     return impl_->discard_loan(sample);
 }
 
+bool DataWriter::amishare_write(void* data)
+{
+    return impl_->amishare_write(data);
+}
+
 bool DataWriter::write(
         void* data, std::string message, unsigned char* buffer, int length)
 {

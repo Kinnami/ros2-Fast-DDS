@@ -211,6 +211,7 @@ bool HelloWorldPublisher::publish(
         std::string s = "BigData" + std::to_string(hello_->index() % 10);
         strcpy(&hello_->data()[data_size - s.length() - 1], s.c_str());
 
+        /*
         SerializedPayload_t payload;
         type_->serialize(hello_.get(), &payload);
         std::cout << "Payload length: " << payload.length << "\n";
@@ -240,9 +241,11 @@ bool HelloWorldPublisher::publish(
         std::cout << "TEBD: actual size is " << length << "\n";
 
         std::cout << "TEBD: hello world publisher has buffer " << buf << "\n";
+        */
 
-        writer_->write(notify.get(), message, reinterpret_cast<unsigned char*>(buf), length);
-        delete[] buf;
+        writer_->amishare_write(hello_.get());
+        //writer_->write(notify.get(), message, reinterpret_cast<unsigned char*>(buf), length);
+        //delete[] buf;
 
         return true;
     }

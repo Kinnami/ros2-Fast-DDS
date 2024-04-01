@@ -616,6 +616,48 @@ ReturnCode_t DataWriterImpl::discard_loan(
     return ReturnCode_t::RETCODE_OK;
 }
 
+bool DataWriterImpl::amishare_write(void* data)
+{
+        /*
+        char *buf;
+        int length;
+        length = data->getMaxCdrSerializedSize();
+        std::cout << "TEBD: max size is " << length << "\n";
+        buf = new char[length];
+        eprosima::fastcdr::FastBuffer buffer(buf, length);
+        eprosima::fastcdr::Cdr message_cdr(buffer, eprosima::fastcdr::Cdr::DEFAULT_ENDIAN, eprosima::fastcdr::CdrVersion::DDS_CDR);
+        data->serialize(message_cdr);
+        length = HelloWorld::getCdrSerializedSize(*hello_);
+        std::cout << "TEBD: actual size is " << length << "\n";
+
+        std::cout << "TEBD: hello world publisher has buffer " << buf << "\n";
+
+        writer_->write(notify.get(), "", reinterpret_cast<unsigned char*>(buf), length);
+        delete[] buf;
+        */
+    PayloadInfo_t payload;
+    bool was_loaned = check_and_remove_loan(data, payload);
+    //if (!was_loaned)
+    //{
+        if (!get_free_payload_from_pool(type_->getSerializedSizeProvider(data), payload))
+        {
+            return ReturnCode_t::RETCODE_OUT_OF_RESOURCES;
+        }
+
+        if (!type_->serialize(data, &payload.payload, data_representation_))
+        {
+            EPROSIMA_LOG_WARNING(DATA_WRITER, "Data serialization returned false");
+            return_payload_to_pool(payload);
+            return ReturnCode_t::RETCODE_ERROR;
+        }
+
+    //SerializedPayload_t payload;
+    //type_->serialize(data, &payload, eprosima::fastdds::dds::DEFAULT_DATA_REPRESENTATION);
+
+    write(data, "", reinterpret_cast<unsigned char*>(payload.payload.data), payload.payload.length);
+    return ReturnCode_t::RETCODE_OK;
+}
+
 bool DataWriterImpl::write(
         void* data, std::string message, unsigned char* buffer, int length)
 {
@@ -1012,26 +1054,6 @@ ReturnCode_t DataWriterImpl::perform_create_new_change(
 #endif // if HAVE_STRICT_REALTIME
 
     PayloadInfo_t payload;
-
-    /*
-    std::cout << "TEBD: starting object create in data writer\n";
-    std::cout << "Topic name? " << getTopicName() << "\n";
-    type_->serialize(data, &payload.payload);
-    //std::cout << "TEBD: data? " << payload.payload.data << "\n";
-    std::cout << "TEBD: length? " << payload.payload.length << "\n";
-    const char** args;
-    args = new const char*[2];
-    std::string file = "/" + getTopicName() + std::to_string(m_iCount++);
-    args[0] = file.c_str();
-
-    //std::string strdata = (std::string)(const char *)payload.payload.data + " " + std::to_string(payload.payload.length);
-    std::string strdata = "Hello, this is the test file\n";
-    args[1] = strdata.c_str();
-
-    object_create(m_poObjectCreate, 2, args);
-    std::cout << "TEBD: finished object create in data writer\n";
-    */
-
     bool was_loaned = check_and_remove_loan(data, payload);
     if (!was_loaned)
     {

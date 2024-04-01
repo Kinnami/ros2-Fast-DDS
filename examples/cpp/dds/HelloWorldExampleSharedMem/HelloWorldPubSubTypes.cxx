@@ -61,10 +61,12 @@ bool HelloWorldPubSubType::serialize(
         SerializedPayload_t* payload,
         DataRepresentationId_t data_representation)
 {
+std::cout << "HelloWorldPubSubType serialize\n";
     HelloWorld* p_type = static_cast<HelloWorld*>(data);
 
     // Object that manages the raw buffer.
     eprosima::fastcdr::FastBuffer fastbuffer(reinterpret_cast<char*>(payload->data), payload->max_size);
+std::cout << "HelloWorldPubSubType serialize max size " << payload->max_size << "\n";
     // Object that serializes the data.
     eprosima::fastcdr::Cdr ser(fastbuffer, eprosima::fastcdr::Cdr::DEFAULT_ENDIAN,
             data_representation == DataRepresentationId_t::XCDR_DATA_REPRESENTATION ?
@@ -95,6 +97,7 @@ bool HelloWorldPubSubType::serialize(
 #else
     payload->length = static_cast<uint32_t>(ser.get_serialized_data_length());
 #endif // FASTCDR_VERSION_MAJOR == 1
+std::cout << "HelloWorldPubSubType serialize payload size " << payload->length << "\n";
     return true;
 }
 
