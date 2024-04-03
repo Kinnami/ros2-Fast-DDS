@@ -190,6 +190,10 @@ public:
             ViewStateMask view_states = ANY_VIEW_STATE,
             InstanceStateMask instance_states = ANY_INSTANCE_STATE);
 
+    ReturnCode_t amishare_take_next_sample(
+            void* data,
+            SampleInfo* info);
+
     ReturnCode_t take_next_sample(
             void* data,
             SampleInfo* info,

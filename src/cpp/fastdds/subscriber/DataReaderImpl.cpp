@@ -763,6 +763,29 @@ ReturnCode_t DataReaderImpl::read_next_sample(
     return read_or_take_next_sample(data, info, false);
 }
 
+ReturnCode_t DataReaderImpl::amishare_take_next_sample(
+        void* data,
+        SampleInfo* info)
+{
+    unsigned char **datareturn;
+    datareturn = new unsigned char*;
+    int datareturnsize;
+    std::string message;
+
+    take_next_sample(data, info, datareturn, datareturnsize, message);
+    // somehow put datareturn into a payload buffer...
+    SerializedPayload_t payload(datareturnsize);
+    payload.data = *datareturn;
+
+    std::cout << "TEBD: data reader deserializing\n";
+    type_->deserialize(&payload, data);
+
+    free(*datareturn);
+    delete datareturn;
+    return ReturnCode_t::RETCODE_OK;
+}
+
+
 ReturnCode_t DataReaderImpl::take_next_sample(
         void* data,
         SampleInfo* info, 
@@ -794,8 +817,8 @@ ReturnCode_t DataReaderImpl::take_next_sample(
     //free(*datareturn); // caller needs to free this?
     //delete datareturn; 
 
-    return read_or_take_next_sample(data, info, true);
-    //return ReturnCode_t::RETCODE_OK;
+    //return read_or_take_next_sample(data, info, true);
+    return ReturnCode_t::RETCODE_OK;
 }
 
 ReturnCode_t DataReaderImpl::get_first_untaken_info(

@@ -105,6 +105,7 @@ bool HelloWorldPubSubType::deserialize(
         SerializedPayload_t* payload,
         void* data)
 {
+std::cout << "HelloWorldPubSubType deserialize\n";
     try
     {
         // Convert DATA to pointer of your type
@@ -112,6 +113,7 @@ bool HelloWorldPubSubType::deserialize(
 
         // Object that manages the raw buffer.
         eprosima::fastcdr::FastBuffer fastbuffer(reinterpret_cast<char*>(payload->data), payload->length);
+        std::cout << "TEBD: deserialize payload length " << payload->length << "\n";
 
         // Object that deserializes the data.
         eprosima::fastcdr::Cdr deser(fastbuffer, eprosima::fastcdr::Cdr::DEFAULT_ENDIAN

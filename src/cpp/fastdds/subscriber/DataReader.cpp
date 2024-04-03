@@ -265,6 +265,13 @@ ReturnCode_t DataReader::read_next_sample(
     return impl_->read_next_sample(data, info);
 }
 
+ReturnCode_t DataReader::amishare_take_next_sample(
+        void* data,
+        SampleInfo* info) 
+{
+    return impl_->amishare_take_next_sample(data, info);
+}
+
 ReturnCode_t DataReader::take_next_sample(
         void* data,
         SampleInfo* info, 

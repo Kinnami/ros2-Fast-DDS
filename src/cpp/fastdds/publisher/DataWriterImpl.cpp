@@ -618,27 +618,10 @@ ReturnCode_t DataWriterImpl::discard_loan(
 
 bool DataWriterImpl::amishare_write(void* data)
 {
-        /*
-        char *buf;
-        int length;
-        length = data->getMaxCdrSerializedSize();
-        std::cout << "TEBD: max size is " << length << "\n";
-        buf = new char[length];
-        eprosima::fastcdr::FastBuffer buffer(buf, length);
-        eprosima::fastcdr::Cdr message_cdr(buffer, eprosima::fastcdr::Cdr::DEFAULT_ENDIAN, eprosima::fastcdr::CdrVersion::DDS_CDR);
-        data->serialize(message_cdr);
-        length = HelloWorld::getCdrSerializedSize(*hello_);
-        std::cout << "TEBD: actual size is " << length << "\n";
-
-        std::cout << "TEBD: hello world publisher has buffer " << buf << "\n";
-
-        writer_->write(notify.get(), "", reinterpret_cast<unsigned char*>(buf), length);
-        delete[] buf;
-        */
     PayloadInfo_t payload;
     bool was_loaned = check_and_remove_loan(data, payload);
-    //if (!was_loaned)
-    //{
+    if (!was_loaned)
+    {
         if (!get_free_payload_from_pool(type_->getSerializedSizeProvider(data), payload))
         {
             return ReturnCode_t::RETCODE_OUT_OF_RESOURCES;
@@ -652,9 +635,10 @@ bool DataWriterImpl::amishare_write(void* data)
         }
 
     //SerializedPayload_t payload;
-    //type_->serialize(data, &payload, eprosima::fastdds::dds::DEFAULT_DATA_REPRESENTATION);
+    //type_->serialize(data, &payload.payload, data_representation_);
 
-    write(data, "", reinterpret_cast<unsigned char*>(payload.payload.data), payload.payload.length);
+        write(data, "", reinterpret_cast<unsigned char*>(payload.payload.data), payload.payload.length);
+    }
     return ReturnCode_t::RETCODE_OK;
 }
 
