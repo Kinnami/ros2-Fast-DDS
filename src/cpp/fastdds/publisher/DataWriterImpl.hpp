@@ -178,7 +178,7 @@ public:
      * @return true if data is correctly delivered to the lower layers, false otherwise.
      */
     bool write(
-            void* data, std::string message, unsigned char* buffer, int length);
+            void* data, unsigned char* buffer, int length);
 
     bool amishare_write(void* data);
 
@@ -421,7 +421,6 @@ protected:
     DataWriterHistory history_;
 
     void ** m_poObjectCreate;
-    int m_iCount;
 
     //!Listener to capture the events of the Writer
     class InnerDataWriterListener : public fastrtps::rtps::WriterListener

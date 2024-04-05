@@ -211,41 +211,7 @@ bool HelloWorldPublisher::publish(
         std::string s = "BigData" + std::to_string(hello_->index() % 10);
         strcpy(&hello_->data()[data_size - s.length() - 1], s.c_str());
 
-        /*
-        SerializedPayload_t payload;
-        type_->serialize(hello_.get(), &payload);
-        std::cout << "Payload length: " << payload.length << "\n";
-        //std::cout << "Payload data: " << payload.data << "\n";
-
-        std::cout << "TEBD: writing\n";
-        std::cout << "Message: " << hello_->message() << "\n";
-        std::cout << "Index: " << hello_->index() << "\n";
-        //std::cout << "Data end: " << (char*)&hello_->data()[1000000] << "\n";
-        std::string message = hello_->message() + " " + std::to_string(hello_->index());
-
-        //writer_->write(hello_.get(), message);
-        std::shared_ptr<HelloWorld> notify;
-        notify = std::make_shared<HelloWorld>();
-        notify->index(0);
-        notify->message(" ");
-
-        char *buf;
-        int length;
-        length = hello_->getMaxCdrSerializedSize();
-        std::cout << "TEBD: max size is " << length << "\n";
-        buf = new char[length];
-        eprosima::fastcdr::FastBuffer buffer(buf, length);
-        eprosima::fastcdr::Cdr message_cdr(buffer, eprosima::fastcdr::Cdr::DEFAULT_ENDIAN, eprosima::fastcdr::CdrVersion::DDS_CDR);
-        hello_->serialize(message_cdr);
-        length = HelloWorld::getCdrSerializedSize(*hello_);
-        std::cout << "TEBD: actual size is " << length << "\n";
-
-        std::cout << "TEBD: hello world publisher has buffer " << buf << "\n";
-        */
-
         writer_->amishare_write(hello_.get());
-        //writer_->write(notify.get(), message, reinterpret_cast<unsigned char*>(buf), length);
-        //delete[] buf;
 
         return true;
     }

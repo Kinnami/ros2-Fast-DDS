@@ -715,8 +715,7 @@ public:
             void* data,
             SampleInfo* info, 
             unsigned char **datareturn,
-            int &datareturnsize,
-            std::string &message);
+            int &datareturnsize);
 
     ///@}
 

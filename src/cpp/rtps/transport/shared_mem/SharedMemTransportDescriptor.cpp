@@ -44,17 +44,6 @@ SharedMemTransportDescriptor::SharedMemTransportDescriptor()
     , rtps_dump_file_("")
 {
     maxMessageSize = s_maximumMessageSize;
-    /*
-    std::cout << "TEBD: starting object create init inside shared mem send\n";
-    m_poObjectCreate = new void*;
-    object_create_init(m_poObjectCreate);
-    std::cout << "TEBD: finished object create init inside shared mem send\n";
-    const char** args;
-    args = new const char*[2];
-    args[0] = "/testsharedmeminit";
-    args[1] = "This is my test file message!\nIt was made after initializing\n";
-    object_create(m_poObjectCreate, 2, args);
-    */
 }
 
 bool SharedMemTransportDescriptor::operator ==(
@@ -67,22 +56,6 @@ bool SharedMemTransportDescriptor::operator ==(
            this->dump_thread_ == t.dump_thread() &&
            PortBasedTransportDescriptor::operator ==(t));
 }
-
-//! Set the size of the shared memory segment
-RTPS_DllAPI void SharedMemTransportDescriptor::segment_size(uint32_t segment_size)
-    {
-    /*
-    std::cout << "TEBD: starting test object create call inside shared mem send\n";
-    const char** args;
-    args = new const char*[2];
-    args[0] = "/testsharedmem";
-    args[1] = "This is my test file message!\nIt should be from the shared memory\n";
-    object_create(m_poObjectCreate, 2, args);
-    std::cout << "TEBD: finished test object create call inside shared mem send\n";
-    */
-
-        segment_size_ = segment_size;
-    }
 
 #ifdef FASTDDS_SHM_TRANSPORT_DISABLED
 TransportInterface* SharedMemTransportDescriptor::create_transport() const

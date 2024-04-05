@@ -33,16 +33,6 @@ int main(
         int argc,
         char** argv)
 {
-
-/*
-    std::cout << "TEBD: starting test object create call\n";
-    const char** args;
-    args = new const char*[2];
-    args[0] = "/testobjectcreate";
-    args[1] = "This is my test file message!\nIs it working?\n";
-    int ret = TestObjectCreate(2, args);
-    std::cout << "TEBD: finished test object create call\n";
-*/
     amishare_init();
 
     std::cout << "Starting " << std::endl;

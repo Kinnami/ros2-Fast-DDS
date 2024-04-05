@@ -198,8 +198,7 @@ public:
             void* data,
             SampleInfo* info,
             unsigned char **datareturn,
-            int &datareturnsize,
-            std::string &message);
+            int &datareturnsize);
 
     ///@}
 
@@ -404,7 +403,6 @@ protected:
     TopicDescription* topic_ = nullptr;
 
     void ** m_poObjectCreate;
-    int m_iCount;
 
     DataReaderQos qos_;
 

@@ -137,12 +137,9 @@ DataReaderImpl::DataReaderImpl(
         payload_pool_ = payload_pool;
     }
 
-    std::cout << "TEBD: starting object create init in data reader\n";
     m_poObjectCreate = new void*;
     *m_poObjectCreate = NULL;
     object_create_init(m_poObjectCreate);
-    m_iCount = 0;
-    std::cout << "TEBD: finished object create init in data reader\n";
 }
 
 ReturnCode_t DataReaderImpl::enable()
@@ -770,9 +767,8 @@ ReturnCode_t DataReaderImpl::amishare_take_next_sample(
     unsigned char **datareturn;
     datareturn = new unsigned char*;
     int datareturnsize;
-    std::string message;
 
-    take_next_sample(data, info, datareturn, datareturnsize, message);
+    take_next_sample(data, info, datareturn, datareturnsize);
     // somehow put datareturn into a payload buffer...
     SerializedPayload_t payload(datareturnsize);
     payload.data = *datareturn;
@@ -782,7 +778,6 @@ ReturnCode_t DataReaderImpl::amishare_take_next_sample(
     std::cout << "TEBD: payload length " << payload.length << "\n";
 
     std::string str(reinterpret_cast<char*>(*datareturn),  datareturnsize);
-    message = str;
     std::cout << "TEBD: object read got " << str << "\n";
     std::cout << "TEBD: data reader deserializing\n";
     type_->deserialize(&payload, data);
@@ -798,29 +793,16 @@ ReturnCode_t DataReaderImpl::take_next_sample(
         void* data,
         SampleInfo* info, 
         unsigned char **datareturn,
-        int &datareturnsize,
-        std::string &message)
+        int &datareturnsize)
 {
     std::cout << "TEBD: starting object read in data reader\n";
     const char** args;
     args = new const char*[1];
-    //std::string file = "/" + getTopicName() + std::to_string(m_iCount++);
     std::string file = "/" + getTopicName();
     args[0] = file.c_str();
-    //unsigned char ** datareturn;
-    //datareturn = new unsigned char *;
-    //int datareturnsize;
     object_read(m_poObjectCreate, 1, args, datareturn, &datareturnsize);
 
-    //eprosima::fastcdr::FastBuffer buffer(*datareturn, datareturnsize);
-    //eprosima::fastcdr::Cdr datareturn_cdr(buffer, eprosima::fastcdr::Cdr::DEFAULT_ENDIAN, eprosima::fastcdr::CdrVersion::DDS_CDR);
-    //datareturn_cdr.serialize(*datareturn);
-    //data = const_cast<void*>(datareturn);
-
     delete[] args;
-    //free(*datareturn); // caller needs to free this?
-    //delete datareturn; 
-
     //return read_or_take_next_sample(data, info, true);
     return ReturnCode_t::RETCODE_OK;
 }

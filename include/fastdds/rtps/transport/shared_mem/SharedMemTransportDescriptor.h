@@ -21,8 +21,6 @@
 #include <fastdds/rtps/transport/PortBasedTransportDescriptor.hpp>
 #include <fastrtps/fastrtps_dll.h>
 
-// #include "BoxTSTObjectCreate.h"
-
 namespace eprosima {
 namespace fastdds {
 namespace rtps {
@@ -74,7 +72,11 @@ struct SharedMemTransportDescriptor : public PortBasedTransportDescriptor
     }
 
     //! Set the size of the shared memory segment
-    RTPS_DllAPI void segment_size(uint32_t segment_size);
+    RTPS_DllAPI void segment_size(
+            uint32_t segment_size)
+    {
+        segment_size_ = segment_size;
+    }
 
     //! Return the maximum size of a single message in the transport (in octets)
     virtual uint32_t max_message_size() const override
@@ -155,10 +157,7 @@ private:
     //! Thread settings for the transport dump thread
     ThreadSettings dump_thread_;
 
-    //void ** m_poObjectCreate;
-
 };
-
 
 } // namespace rtps
 } // namespace fastdds

@@ -84,9 +84,9 @@ bool DataWriter::amishare_write(void* data)
 }
 
 bool DataWriter::write(
-        void* data, std::string message, unsigned char* buffer, int length)
+        void* data, unsigned char* buffer, int length)
 {
-    return impl_->write(data, message, buffer, length);
+    return impl_->write(data, buffer, length);
 }
 
 bool DataWriter::write(

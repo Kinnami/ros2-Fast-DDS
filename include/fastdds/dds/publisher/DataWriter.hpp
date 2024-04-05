@@ -1,4 +1,4 @@
-// Copyright 2019 Proyectos y Sistemas de Mantenimiento SL (eProsima).
+/// Copyright 2019 Proyectos y Sistemas de Mantenimiento SL (eProsima).
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -139,7 +139,7 @@ public:
      */
     RTPS_DllAPI bool amishare_write(void* data);
     RTPS_DllAPI bool write(
-            void* data, std::string message, unsigned char* buffer, int length);
+            void* data, unsigned char* buffer, int length);
 
     /**
      * Write data with params to the topic.
