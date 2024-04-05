@@ -150,13 +150,14 @@ void HelloWorldSubscriber::SubListener::on_data_available(
     unsigned char **datareturn;
     datareturn = new unsigned char*;
     int datareturnsize;
-    if (reader->take_next_sample(hello_.get(), &info, datareturn, datareturnsize, message) == ReturnCode_t::RETCODE_OK)
+    //if (reader->take_next_sample(hello_.get(), &info, datareturn, datareturnsize, message) == ReturnCode_t::RETCODE_OK)
+    if (reader->amishare_take_next_sample(hello_.get(), &info) == ReturnCode_t::RETCODE_OK)
     {
         //std::string str(reinterpret_cast<char*>(*datareturn), datareturnsize);
         //std::cout << "TEBD: subscriber got message " << str << "\n";
-        eprosima::fastcdr::FastBuffer buffer(reinterpret_cast<char*>(*datareturn), datareturnsize);
-        eprosima::fastcdr::Cdr datareturn_cdr(buffer, eprosima::fastcdr::Cdr::DEFAULT_ENDIAN, eprosima::fastcdr::CdrVersion::DDS_CDR);
-        hello_->deserialize(datareturn_cdr);
+        //eprosima::fastcdr::FastBuffer buffer(reinterpret_cast<char*>(*datareturn), datareturnsize);
+        //eprosima::fastcdr::Cdr datareturn_cdr(buffer, eprosima::fastcdr::Cdr::DEFAULT_ENDIAN, eprosima::fastcdr::CdrVersion::DDS_CDR);
+        //hello_->deserialize(datareturn_cdr);
 
             const size_t data_size = hello_->data().size();
             // Print your structure data here.
@@ -175,8 +176,8 @@ void HelloWorldSubscriber::SubListener::on_data_available(
         }
         */
     }
-    free(*datareturn); // allocated by object_read
-    delete datareturn;
+    //free(*datareturn); // allocated by object_read
+    //delete datareturn;
 }
 
 void HelloWorldSubscriber::run()

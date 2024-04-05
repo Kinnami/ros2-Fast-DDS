@@ -776,11 +776,19 @@ ReturnCode_t DataReaderImpl::amishare_take_next_sample(
     // somehow put datareturn into a payload buffer...
     SerializedPayload_t payload(datareturnsize);
     payload.data = *datareturn;
+    payload.length = datareturnsize;
 
+    std::cout << "TEBD: length " << datareturnsize << "\n";
+    std::cout << "TEBD: payload length " << payload.length << "\n";
+
+    std::string str(reinterpret_cast<char*>(*datareturn),  datareturnsize);
+    message = str;
+    std::cout << "TEBD: object read got " << str << "\n";
     std::cout << "TEBD: data reader deserializing\n";
     type_->deserialize(&payload, data);
+    std::cout << "TEBD: data reader deserializing done\n";
 
-    free(*datareturn);
+    //free(*datareturn);
     delete datareturn;
     return ReturnCode_t::RETCODE_OK;
 }
@@ -803,16 +811,12 @@ ReturnCode_t DataReaderImpl::take_next_sample(
     //datareturn = new unsigned char *;
     //int datareturnsize;
     object_read(m_poObjectCreate, 1, args, datareturn, &datareturnsize);
-    //int object_read(void** a_poObjectCreate, const int a_iArgC, const char * a_apszArgV[], BYTE ** a_pbReturn, int* a_iReturnSize)
 
     //eprosima::fastcdr::FastBuffer buffer(*datareturn, datareturnsize);
     //eprosima::fastcdr::Cdr datareturn_cdr(buffer, eprosima::fastcdr::Cdr::DEFAULT_ENDIAN, eprosima::fastcdr::CdrVersion::DDS_CDR);
     //datareturn_cdr.serialize(*datareturn);
     //data = const_cast<void*>(datareturn);
 
-    std::string str(reinterpret_cast<char*>(*datareturn),  datareturnsize);
-    message = str;
-    std::cout << "TEBD: object read got " << str << "\n";
     delete[] args;
     //free(*datareturn); // caller needs to free this?
     //delete datareturn; 
