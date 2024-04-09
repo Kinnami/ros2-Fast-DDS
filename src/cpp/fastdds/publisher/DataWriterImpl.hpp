@@ -178,7 +178,7 @@ public:
      * @return true if data is correctly delivered to the lower layers, false otherwise.
      */
     bool write(
-            void* data, unsigned char* buffer, int length);
+            void* data);
 
     bool amishare_write(void* data);
 

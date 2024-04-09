@@ -603,28 +603,31 @@ bool DataWriterImpl::amishare_write(void* data)
             return ReturnCode_t::RETCODE_ERROR;
         }
 
-        write(data, reinterpret_cast<unsigned char*>(payload.payload.data), payload.payload.length);
+        unsigned char* buffer = payload.payload.data;
+        int length = payload.payload.length;
+        std::cout << "TEBD: starting object create in data writer\n";
+        const char** args;
+        args = new const char*[3];
+        std::string file = "/" + getTopicName();
+        args[0] = file.c_str();
+        std::cout << "TEBD: writing buffer with length " << length << "\n";
+        std::string buf(reinterpret_cast<char const*>(buffer), length);
+        args[1] = buf.c_str();
+        std::string len = std::to_string(length);
+        args[2] = len.c_str();
+        object_update(m_poObjectCreate, 3, args);
+        std::cout << "TEBD: finished object create in data writer\n";
+        delete[] args;
+    
+        create_new_change(ALIVE, data);
+       //write(data, reinterpret_cast<unsigned char*>(payload.payload.data), payload.payload.length);
     }
     return ReturnCode_t::RETCODE_OK;
 }
 
 bool DataWriterImpl::write(
-        void* data, unsigned char* buffer, int length)
+        void* data)
 {
-    std::cout << "TEBD: starting object create in data writer\n";
-    const char** args;
-    args = new const char*[3];
-    std::string file = "/" + getTopicName();
-    args[0] = file.c_str();
-    std::cout << "TEBD: writing buffer with length " << length << "\n";
-    std::string buf(reinterpret_cast<char const*>(buffer), length);
-    args[1] = buf.c_str();
-    std::string len = std::to_string(length);
-    args[2] = len.c_str();
-    object_update(m_poObjectCreate, 3, args);
-    std::cout << "TEBD: finished object create in data writer\n";
-    delete[] args;
-
     if (writer_ == nullptr)
     {
         return false;

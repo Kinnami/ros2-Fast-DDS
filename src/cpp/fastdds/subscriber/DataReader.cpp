@@ -274,11 +274,9 @@ ReturnCode_t DataReader::amishare_take_next_sample(
 
 ReturnCode_t DataReader::take_next_sample(
         void* data,
-        SampleInfo* info, 
-        unsigned char **datareturn,
-        int &datareturnsize)
+        SampleInfo* info) 
 {
-    return impl_->take_next_sample(data, info, datareturn, datareturnsize);
+    return impl_->take_next_sample(data, info);
 }
 
 ReturnCode_t DataReader::get_first_untaken_info(

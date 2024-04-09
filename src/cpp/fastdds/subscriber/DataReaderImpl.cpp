@@ -768,7 +768,15 @@ ReturnCode_t DataReaderImpl::amishare_take_next_sample(
     datareturn = new unsigned char*;
     int datareturnsize;
 
-    take_next_sample(data, info, datareturn, datareturnsize);
+    //take_next_sample(data, info, datareturn, datareturnsize);
+    std::cout << "TEBD: starting object read in data reader\n";
+    const char** args;
+    args = new const char*[1];
+    std::string file = "/" + getTopicName();
+    args[0] = file.c_str();
+    object_read(m_poObjectCreate, 1, args, datareturn, &datareturnsize);
+    delete[] args;
+
     // somehow put datareturn into a payload buffer...
     SerializedPayload_t payload(datareturnsize);
     payload.data = *datareturn;
@@ -791,20 +799,9 @@ ReturnCode_t DataReaderImpl::amishare_take_next_sample(
 
 ReturnCode_t DataReaderImpl::take_next_sample(
         void* data,
-        SampleInfo* info, 
-        unsigned char **datareturn,
-        int &datareturnsize)
+        SampleInfo* info) 
 {
-    std::cout << "TEBD: starting object read in data reader\n";
-    const char** args;
-    args = new const char*[1];
-    std::string file = "/" + getTopicName();
-    args[0] = file.c_str();
-    object_read(m_poObjectCreate, 1, args, datareturn, &datareturnsize);
-
-    delete[] args;
-    //return read_or_take_next_sample(data, info, true);
-    return ReturnCode_t::RETCODE_OK;
+    return read_or_take_next_sample(data, info, true);
 }
 
 ReturnCode_t DataReaderImpl::get_first_untaken_info(
