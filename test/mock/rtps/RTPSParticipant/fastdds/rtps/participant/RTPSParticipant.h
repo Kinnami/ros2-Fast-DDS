@@ -23,12 +23,13 @@
 #include <fastdds/rtps/common/Guid.h>
 #include <fastdds/rtps/reader/StatefulReader.h>
 #include <fastdds/rtps/resources/ResourceEvent.h>
-#include <fastdds/statistics/rtps/monitor_service/Interfaces.hpp>
 #include <fastrtps/fastrtps_dll.h>
 #include <fastrtps/qos/ReaderQos.h>
 #include <fastrtps/qos/WriterQos.h>
 
 #include <gmock/gmock.h>
+
+#include <statistics/rtps/monitor-service/Interfaces.hpp>
 
 namespace eprosima {
 
@@ -218,6 +219,11 @@ public:
                 const TopicAttributes& topicAtt,
                 const ReaderQos& rqos,
                 const fastdds::rtps::ContentFilterProperty* content_filter));
+
+    std::vector<fastdds::rtps::TransportNetmaskFilterInfo> get_netmask_filter_info() const
+    {
+        return {};
+    }
 
     const RTPSParticipantAttributes& getRTPSParticipantAttributes()
     {

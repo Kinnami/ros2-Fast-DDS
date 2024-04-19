@@ -33,6 +33,8 @@
 #include <fastdds/rtps/common/Types.h>
 #include <fastdds/rtps/flowcontrol/FlowControllerConsts.hpp>
 #include <fastdds/rtps/resources/ResourceManagement.h>
+#include <fastdds/rtps/transport/network/NetmaskFilterKind.hpp>
+
 #include <fastrtps/types/TypeObject.h>
 #include <fastrtps/utils/collections/ResourceLimitedVector.hpp>
 
@@ -1726,21 +1728,21 @@ public:
      * @brief Specifies the maximum number of data-samples the DataWriter (or DataReader) can manage across all the
      * instances associated with it. Represents the maximum samples the middleware can store for any one DataWriter
      * (or DataReader). <br>
-     * Value 0 means infinite resources. By default, 5000.
+     * Value less or equal to 0 means infinite resources. By default, 5000.
      *
      * @warning It is inconsistent if `max_samples < (max_instances * max_samples_per_instance)`.
      */
     int32_t max_samples;
     /**
      * @brief Represents the maximum number of instances DataWriter (or DataReader) can manage. <br>
-     * Value 0 means infinite resources. By default, 10.
+     * Value less or equal to 0 means infinite resources. By default, 10.
      *
      * @warning It is inconsistent if `(max_instances * max_samples_per_instance) > max_samples`.
      */
     int32_t max_instances;
     /**
      * @brief Represents the maximum number of samples of any one instance a DataWriter(or DataReader) can manage. <br>
-     * Value 0 means infinite resources. By default, 400.
+     * Value less or equal to 0 means infinite resources. By default, 400.
      *
      * @warning It is inconsistent if `(max_instances * max_samples_per_instance) > max_samples`.
      */
@@ -2747,6 +2749,8 @@ public:
         , use_builtin_transports(true)
         , send_socket_buffer_size(0)
         , listen_socket_buffer_size(0)
+        , max_msg_size_no_frag(0)
+        , netmask_filter(fastdds::rtps::NetmaskFilterKind::AUTO)
     {
     }
 
@@ -2763,6 +2767,8 @@ public:
                (this->send_socket_buffer_size == b.send_socket_buffer_size) &&
                (this->listen_socket_buffer_size == b.listen_socket_buffer_size) &&
                (this->builtin_transports_reception_threads_ == b.builtin_transports_reception_threads_) &&
+               (this->max_msg_size_no_frag == b.max_msg_size_no_frag) &&
+               (this->netmask_filter == b.netmask_filter) &&
                QosPolicy::operator ==(b);
     }
 
@@ -2791,6 +2797,15 @@ public:
 
     //! Thread settings for the builtin transports reception threads
     rtps::ThreadSettings builtin_transports_reception_threads_;
+
+    /*! Maximum message size used to avoid fragmentation, set ONLY in LARGE_DATA. If this value is
+     * not zero, the network factory will allow the initialization of UDP transports with maxMessageSize
+     * higher than 65500K.
+     */
+    uint32_t max_msg_size_no_frag;
+
+    //! Netmask filter configuration
+    fastdds::rtps::NetmaskFilterKind netmask_filter;
 };
 
 //! Qos Policy to configure the endpoint

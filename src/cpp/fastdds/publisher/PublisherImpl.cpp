@@ -31,8 +31,10 @@
 #include <fastdds/dds/domain/DomainParticipantListener.hpp>
 #include <fastdds/dds/topic/TypeSupport.hpp>
 
-#include <fastdds/rtps/participant/RTPSParticipant.h>
 #include <fastdds/dds/log/Log.hpp>
+#include <fastdds/rtps/participant/RTPSParticipant.h>
+
+#include <rtps/network/utils/netmask_filter.hpp>
 
 #include <fastrtps/attributes/PublisherAttributes.h>
 
@@ -238,6 +240,24 @@ DataWriter* PublisherImpl::create_datawriter(
     if (!DataWriterImpl::check_qos_including_resource_limits(qos, type_support))
     {
         return nullptr;
+    }
+
+    // Check netmask filtering preconditions
+    if (nullptr != rtps_participant_)
+    {
+        std::vector<fastdds::rtps::TransportNetmaskFilterInfo> netmask_filter_info =
+                rtps_participant_->get_netmask_filter_info();
+        std::string error_msg;
+        if (!fastdds::rtps::network::netmask_filter::check_preconditions(netmask_filter_info,
+                qos.endpoint().ignore_non_matching_locators,
+                error_msg) ||
+                !fastdds::rtps::network::netmask_filter::check_preconditions(netmask_filter_info,
+                qos.endpoint().external_unicast_locators, error_msg))
+        {
+            EPROSIMA_LOG_ERROR(PUBLISHER,
+                    "Failed to create writer -> " << error_msg);
+            return nullptr;
+        }
     }
 
     DataWriterImpl* impl = create_datawriter_impl(type_support, topic, qos, listener, payload_pool);
@@ -650,8 +670,7 @@ PublisherListener* PublisherImpl::get_listener_for(
 
 #ifdef FASTDDS_STATISTICS
 bool PublisherImpl::get_monitoring_status(
-        const uint32_t& status_id,
-        statistics::rtps::DDSEntityStatus*& status,
+        statistics::MonitorServiceData& status,
         const fastrtps::rtps::GUID_t& entity_guid)
 {
     bool ret = false;
@@ -662,11 +681,21 @@ bool PublisherImpl::get_monitoring_status(
         {
             if (writer->guid() == entity_guid)
             {
-                switch (status_id)
+                switch (status._d())
                 {
                     case statistics::INCOMPATIBLE_QOS:
                     {
-                        writer->get_offered_incompatible_qos_status(*static_cast<OfferedIncompatibleQosStatus*>(status));
+                        OfferedIncompatibleQosStatus incompatible_qos_status;
+                        writer->get_offered_incompatible_qos_status(incompatible_qos_status);
+                        status.incompatible_qos_status().total_count(incompatible_qos_status.total_count);
+                        status.incompatible_qos_status().last_policy_id(incompatible_qos_status.last_policy_id);
+                        for (auto& qos : incompatible_qos_status.policies)
+                        {
+                            statistics::QosPolicyCount_s count;
+                            count.count(qos.count);
+                            count.policy_id(qos.policy_id);
+                            status.incompatible_qos_status().policies().push_back(count);
+                        }
                         ret = true;
                         break;
                     }
@@ -679,19 +708,27 @@ bool PublisherImpl::get_monitoring_status(
                        }*/
                     case statistics::LIVELINESS_LOST:
                     {
-                        writer->get_liveliness_lost_status(*static_cast<LivelinessLostStatus*>(status));
+                        LivelinessLostStatus liveliness_lost_status;
+                        writer->get_liveliness_lost_status(liveliness_lost_status);
+                        status.liveliness_lost_status().total_count(liveliness_lost_status.total_count);
                         ret = true;
                         break;
                     }
                     case statistics::DEADLINE_MISSED:
                     {
-                        writer->get_offered_deadline_missed_status(*static_cast<DeadlineMissedStatus*>(status));
+                        DeadlineMissedStatus deadline_missed_status;
+                        writer->get_offered_deadline_missed_status(deadline_missed_status);
+                        status.deadline_missed_status().total_count(deadline_missed_status.total_count);
+                        std::memcpy(
+                            status.deadline_missed_status().last_instance_handle().data(),
+                            deadline_missed_status.last_instance_handle.value,
+                            16);
                         ret = true;
                         break;
                     }
                     default:
                     {
-                        EPROSIMA_LOG_ERROR(PUBLISHER, "Queried status not available for this entity " << status_id);
+                        EPROSIMA_LOG_ERROR(PUBLISHER, "Queried status not available for this entity " << status._d());
                         break;
                     }
                 }

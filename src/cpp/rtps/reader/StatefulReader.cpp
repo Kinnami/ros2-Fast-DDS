@@ -21,20 +21,22 @@
 #include <mutex>
 #include <thread>
 
-#include <fastdds/rtps/reader/StatefulReader.h>
-#include <fastdds/rtps/reader/ReaderListener.h>
-#include <fastdds/rtps/history/ReaderHistory.h>
 #include <fastdds/dds/log/Log.hpp>
-#include <fastdds/rtps/messages/RTPSMessageCreator.h>
-#include <rtps/participant/RTPSParticipantImpl.h>
-#include <rtps/reader/WriterProxy.h>
-#include <fastrtps/utils/TimeConversion.h>
-#include <rtps/history/HistoryAttributesExtension.hpp>
-#include <rtps/DataSharing/DataSharingListener.hpp>
-#include <rtps/DataSharing/ReaderPool.hpp>
 #include <fastdds/rtps/builtin/BuiltinProtocols.h>
 #include <fastdds/rtps/builtin/liveliness/WLP.h>
+#include <fastdds/rtps/common/VendorId_t.hpp>
+#include <fastdds/rtps/history/ReaderHistory.h>
+#include <fastdds/rtps/messages/RTPSMessageCreator.h>
+#include <fastdds/rtps/reader/ReaderListener.h>
+#include <fastdds/rtps/reader/StatefulReader.h>
 #include <fastdds/rtps/writer/LivelinessManager.h>
+#include <fastrtps/utils/TimeConversion.h>
+
+#include <rtps/DataSharing/DataSharingListener.hpp>
+#include <rtps/DataSharing/ReaderPool.hpp>
+#include <rtps/history/HistoryAttributesExtension.hpp>
+#include <rtps/participant/RTPSParticipantImpl.h>
+#include <rtps/reader/WriterProxy.h>
 
 #include "rtps/RTPSDomainImpl.hpp"
 
@@ -723,6 +725,7 @@ bool StatefulReader::processDataFragMsg(
                     {
                         work_change->copy_not_memcpy(change_to_add);
                         work_change->serializedPayload.length = sampleSize;
+                        work_change->instanceHandle.clear();
                         work_change->setFragmentSize(change_to_add->getFragmentSize(), true);
                         change_created = work_change;
                     }
@@ -731,6 +734,12 @@ bool StatefulReader::processDataFragMsg(
 
             if (work_change != nullptr)
             {
+                // Set the instanceHandle only when fragment number 1 is received
+                if (!work_change->instanceHandle.isDefined() && fragmentStartingNum == 1)
+                {
+                    work_change->instanceHandle = change_to_add->instanceHandle;
+                }
+
                 work_change->add_fragments(change_to_add->serializedPayload, fragmentStartingNum,
                         fragmentsInSubmessage);
             }
@@ -815,7 +824,8 @@ bool StatefulReader::processHeartbeatMsg(
         const SequenceNumber_t& firstSN,
         const SequenceNumber_t& lastSN,
         bool finalFlag,
-        bool livelinessFlag)
+        bool livelinessFlag,
+        eprosima::fastdds::rtps::VendorId_t /*origin_vendor_id*/)
 {
     WriterProxy* writer = nullptr;
 
@@ -881,7 +891,8 @@ bool StatefulReader::processHeartbeatMsg(
 bool StatefulReader::processGapMsg(
         const GUID_t& writerGUID,
         const SequenceNumber_t& gapStart,
-        const SequenceNumberSet_t& gapList)
+        const SequenceNumberSet_t& gapList,
+        eprosima::fastdds::rtps::VendorId_t /*origin_vendor_id*/)
 {
     WriterProxy* pWP = nullptr;
 

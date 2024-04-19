@@ -47,37 +47,47 @@ endif()
 
 # Filter pksc11 related tests if library is not available
 if(NOT LibP11_FOUND)
-    set(pkcs_filter "-*pkcs*")
+    set(pkcs_filter "*pkcs*")
 endif() # LibP11_FOUND
 
 if(EPROSIMA_TEST_DNS_NOT_SET_UP)
-    set(dns_filter "-Discovery.ServerClientEnvironmentSetUpDNS")
+    set(dns_filter "*ServerClientEnvironmentSetUpDNS*")
 endif()
+
+string(JOIN ":" BLACKBOX_HIGH_LEVEL_IGNORED_TESTS ${pkcs_filter} ${dns_filter})
+if(NOT BLACKBOX_HIGH_LEVEL_IGNORED_TESTS STREQUAL "")
+	message(STATUS "Ignoring tests '${BLACKBOX_HIGH_LEVEL_IGNORED_TESTS}'")
+    string(PREPEND BLACKBOX_HIGH_LEVEL_IGNORED_TESTS "-")
+endif()
+message(STATUS "BLACKBOX_HIGH_LEVEL_IGNORED_TESTS set to '${BLACKBOX_HIGH_LEVEL_IGNORED_TESTS}'")
 
 file(GLOB RTPS_BLACKBOXTESTS_TEST_SOURCE "common/RTPSBlackboxTests*.cpp")
 set(RTPS_BLACKBOXTESTS_SOURCE ${RTPS_BLACKBOXTESTS_TEST_SOURCE}
+    types/Data1mb.cxx
+    types/Data1mbPubSubTypes.cxx
+    types/Data1mbv1.cxx
+    types/Data64kb.cxx
+    types/Data64kbPubSubTypes.cxx
+    types/Data64kbv1.cxx
+    types/FixedSized.cxx
+    types/FixedSizedPubSubTypes.cxx
+    types/FixedSizedv1.cxx
     types/HelloWorld.cxx
-    types/HelloWorldv1.cxx
     types/HelloWorldPubSubTypes.cxx
     types/HelloWorldTypeObject.cxx
-    types/KeyedHelloWorld.cxx
-    types/KeyedHelloWorldv1.cxx
-    types/KeyedHelloWorldPubSubTypes.cxx
-    types/StringTest.cxx
-    types/StringTestv1.cxx
-    types/StringTestPubSubTypes.cxx
-    types/Data64kb.cxx
-    types/Data64kbv1.cxx
-    types/Data64kbPubSubTypes.cxx
-    types/Data1mb.cxx
-    types/Data1mbv1.cxx
-    types/Data1mbPubSubTypes.cxx
+    types/HelloWorldv1.cxx
     types/KeyedData1mb.cxx
-    types/KeyedData1mbv1.cxx
     types/KeyedData1mbPubSubTypes.cxx
-    types/FixedSized.cxx
-    types/FixedSizedv1.cxx
-    types/FixedSizedPubSubTypes.cxx
+    types/KeyedData1mbv1.cxx
+    types/KeyedHelloWorld.cxx
+    types/KeyedHelloWorldPubSubTypes.cxx
+    types/KeyedHelloWorldv1.cxx
+    types/StringTest.cxx
+    types/StringTestPubSubTypes.cxx
+    types/StringTestv1.cxx
+    types/UnboundedHelloWorld.cxx
+    types/UnboundedHelloWorldPubSubTypes.cxx
+    types/UnboundedHelloWorldv1.cxx
 
     utils/data_generators.cpp
     utils/lambda_functions.cpp
@@ -96,49 +106,53 @@ target_include_directories(BlackboxTests_RTPS PRIVATE
     ${Asio_INCLUDE_DIR})
 target_link_libraries(BlackboxTests_RTPS fastrtps fastcdr foonathan_memory GTest::gtest)
 gtest_discover_tests(BlackboxTests_RTPS
-    TEST_FILTER ${pkcs_filter}
+    TEST_PREFIX "BlackboxTests_RTPS."
+    TEST_FILTER ${BLACKBOX_HIGH_LEVEL_IGNORED_TESTS}
     NO_PRETTY_VALUES
     )
 
 file(GLOB BLACKBOXTESTS_TEST_SOURCE "common/BlackboxTests*.cpp")
 set(BLACKBOXTESTS_SOURCE ${BLACKBOXTESTS_TEST_SOURCE}
+    types/Data1mb.cxx
+    types/Data1mbPubSubTypes.cxx
+    types/Data1mbv1.cxx
+    types/Data64kb.cxx
+    types/Data64kbPubSubTypes.cxx
+    types/Data64kbv1.cxx
+    types/FixedSized.cxx
+    types/FixedSizedPubSubTypes.cxx
+    types/FixedSizedv1.cxx
     types/HelloWorld.cxx
-    types/HelloWorldv1.cxx
     types/HelloWorldPubSubTypes.cxx
     types/HelloWorldTypeObject.cxx
-    types/KeyedHelloWorld.cxx
-    types/KeyedHelloWorldv1.cxx
-    types/KeyedHelloWorldPubSubTypes.cxx
-    types/StringTest.cxx
-    types/StringTestv1.cxx
-    types/StringTestPubSubTypes.cxx
-    types/Data64kb.cxx
-    types/Data64kbv1.cxx
-    types/Data64kbPubSubTypes.cxx
-    types/Data1mb.cxx
-    types/Data1mbv1.cxx
-    types/Data1mbPubSubTypes.cxx
+    types/HelloWorldv1.cxx
     types/KeyedData1mb.cxx
-    types/KeyedData1mbv1.cxx
     types/KeyedData1mbPubSubTypes.cxx
-    types/FixedSized.cxx
-    types/FixedSizedv1.cxx
-    types/FixedSizedPubSubTypes.cxx
+    types/KeyedData1mbv1.cxx
+    types/KeyedHelloWorld.cxx
+    types/KeyedHelloWorldPubSubTypes.cxx
+    types/KeyedHelloWorldv1.cxx
+    types/StringTest.cxx
+    types/StringTestPubSubTypes.cxx
+    types/StringTestv1.cxx
     types/TestIncludeRegression3361.cxx
-    types/TestIncludeRegression3361v1.cxx
     types/TestIncludeRegression3361TypeObject.cxx
+    types/TestIncludeRegression3361v1.cxx
     types/TestRegression3361.cxx
-    types/TestRegression3361v1.cxx
     types/TestRegression3361PubSubTypes.cxx
     types/TestRegression3361TypeObject.cxx
+    types/TestRegression3361v1.cxx
+    types/UnboundedHelloWorld.cxx
+    types/UnboundedHelloWorldPubSubTypes.cxx
+    types/UnboundedHelloWorldv1.cxx
 
     utils/data_generators.cpp
     utils/lambda_functions.cpp
     utils/print_functions.cpp
 
     common/DatagramInjectionTransport.cpp
-    common/TCPReqRepHelloWorldRequester.cpp
-    common/TCPReqRepHelloWorldReplier.cpp
+    api/dds-pim/TCPReqRepHelloWorldRequester.cpp
+    api/dds-pim/TCPReqRepHelloWorldReplier.cpp
     )
 
 file(GLOB DDS_BLACKBOXTESTS_TEST_SOURCE "common/DDSBlackboxTests*.cpp")
@@ -179,6 +193,8 @@ configure_file(${CMAKE_CURRENT_SOURCE_DIR}/partitions_profile.xml
     ${CMAKE_CURRENT_BINARY_DIR}/partitions_profile.xml)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/builtin_transports_profile.xml
     ${CMAKE_CURRENT_BINARY_DIR}/builtin_transports_profile.xml)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/auth_handshake_props_profile.xml
+    ${CMAKE_CURRENT_BINARY_DIR}/auth_handshake_props_profile.xml COPYONLY)
 file(COPY "${CMAKE_CURRENT_SOURCE_DIR}/datagrams" DESTINATION "${CMAKE_CURRENT_BINARY_DIR}")
 
 if(FASTRTPS_API_TESTS)
@@ -216,7 +232,8 @@ if(FASTRTPS_API_TESTS)
             ENVIRONMENT "R_UNICAST_PORT_RANDOM_NUMBER=${R_UNICAST_PORT_RANDOM_NUMBER}"
             ENVIRONMENT "MULTICAST_PORT_RANDOM_NUMBER=${MULTICAST_PORT_RANDOM_NUMBER}"
             ENVIRONMENT $<IF:$<BOOL:${OPENSSL_CONF}>,OPENSSL_CONF=${OPENSSL_CONF},>
-        TEST_FILTER ${pkcs_filter} ${dns_filter}
+        TEST_PREFIX "BlackboxTests_FastRTPS."
+        TEST_FILTER ${BLACKBOX_HIGH_LEVEL_IGNORED_TESTS}
         NO_PRETTY_VALUES
         )
 endif(FASTRTPS_API_TESTS)
@@ -270,7 +287,8 @@ if(FASTDDS_PIM_API_TESTS)
             ENVIRONMENT "R_UNICAST_PORT_RANDOM_NUMBER=${R_UNICAST_PORT_RANDOM_NUMBER}"
             ENVIRONMENT "MULTICAST_PORT_RANDOM_NUMBER=${MULTICAST_PORT_RANDOM_NUMBER}"
             ENVIRONMENT $<IF:$<BOOL:${OPENSSL_CONF}>,OPENSSL_CONF=${OPENSSL_CONF},>
-        TEST_FILTER ${pkcs_filter} ${dns_filter}
+        TEST_PREFIX "BlackboxTests_DDS_PIM."
+        TEST_FILTER ${BLACKBOX_HIGH_LEVEL_IGNORED_TESTS}
         NO_PRETTY_VALUES
         )
 endif(FASTDDS_PIM_API_TESTS)

@@ -40,12 +40,12 @@
 #include <fastdds/rtps/builtin/data/ReaderProxyData.h>
 #include <fastdds/rtps/builtin/data/WriterProxyData.h>
 #include <fastdds/rtps/common/Guid.h>
+#include <fastdds/rtps/common/LocatorList.hpp>
 #include <fastdds/rtps/history/IChangePool.h>
 #include <fastdds/rtps/history/IPayloadPool.h>
 #include <fastdds/rtps/messages/MessageReceiver.h>
 #include <fastdds/rtps/resources/ResourceEvent.h>
 #include <fastdds/rtps/transport/SenderResource.h>
-#include <fastdds/statistics/rtps/monitor_service/interfaces/IConnectionsQueryable.hpp>
 #include <fastrtps/utils/Semaphore.h>
 #include <fastrtps/utils/shared_mutex.hpp>
 
@@ -54,6 +54,8 @@
 #include <rtps/messages/SendBuffersManager.hpp>
 #include <rtps/network/NetworkFactory.h>
 #include <rtps/network/ReceiverResource.h>
+#include <statistics/rtps/monitor-service/interfaces/IConnectionsObserver.hpp>
+#include <statistics/rtps/monitor-service/interfaces/IConnectionsQueryable.hpp>
 #include <statistics/rtps/StatisticsBase.hpp>
 #include <statistics/types/monitorservice_types.h>
 
@@ -549,6 +551,8 @@ private:
     uint32_t domain_id_;
     //!Attributes of the RTPSParticipant
     RTPSParticipantAttributes m_att;
+    //! Metatraffic unicast port used by default on this participant
+    uint32_t metatraffic_unicast_port_ = 0;
     //!Guid of the RTPSParticipant.
     GUID_t m_guid;
     //! String containing the RTPSParticipant Guid.
@@ -620,6 +624,11 @@ private:
     std::set<GUID_t> ignored_readers_;
     //! Protect ignored entities collection concurrent access
     mutable shared_mutex ignored_mtx_;
+
+    void setup_meta_traffic();
+    void setup_user_traffic();
+    void setup_initial_peers();
+    void setup_output_traffic();
 
     RTPSParticipantImpl& operator =(
             const RTPSParticipantImpl&) = delete;
@@ -1039,6 +1048,15 @@ public:
     void createSenderResources(
             const Locator_t& locator);
 
+    /**
+     * Creates sender resources for the given locator selector entry by calling the NetworkFactory's
+     * build_send_resources method.
+     *
+     * @param locator_selector The locator selector entry for which sender resources need to be created.
+     */
+    void createSenderResources(
+            const LocatorSelectorEntry& locator_selector);
+
     bool networkFactoryHasRegisteredTransports() const;
 
     /**
@@ -1099,6 +1117,13 @@ public:
      */
     bool ignore_reader(
             const GUID_t& reader_guid);
+
+    /**
+     * @brief Returns registered transports' netmask filter information (transport's netmask filter kind and allowlist).
+     *
+     * @return A vector with all registered transports' netmask filter information.
+     */
+    std::vector<fastdds::rtps::TransportNetmaskFilterInfo> get_netmask_filter_info() const;
 
     template <EndpointKind_t kind, octet no_key, octet with_key>
     static bool preprocess_endpoint_attributes(
@@ -1265,6 +1290,14 @@ public:
     {
         return match_local_endpoints_;
     }
+
+    /**
+     * Method called on participant removal with the set of locators associated to the participant.
+     *
+     * @param remote_participant_locators Set of locators associated to the participant removed.
+     */
+    void update_removed_participant(
+            const LocatorList_t& remote_participant_locators);
 
 };
 } // namespace rtps

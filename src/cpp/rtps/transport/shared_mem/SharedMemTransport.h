@@ -51,7 +51,8 @@ public:
     const SharedMemTransportDescriptor* configuration() const;
 
     bool init(
-            const fastrtps::rtps::PropertyPolicy* properties = nullptr) override;
+            const fastrtps::rtps::PropertyPolicy* properties = nullptr,
+            const uint32_t& max_msg_size_no_frag = 0) override;
 
     ~SharedMemTransport() override;
 
@@ -199,6 +200,8 @@ public:
     }
 
 private:
+
+    using TransportInterface::transform_remote_locator;
 
     //! Constructor with no descriptor is necessary for implementations derived from this class.
     SharedMemTransport();

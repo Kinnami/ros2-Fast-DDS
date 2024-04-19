@@ -19,6 +19,7 @@
 #include <memory>
 
 #include <fastdds/rtps/common/Locator.h>
+#include <fastdds/rtps/common/LocatorList.hpp>
 #include <fastdds/rtps/common/LocatorSelector.hpp>
 #include <fastdds/rtps/messages/MessageReceiver.h>
 #include <fastdds/rtps/transport/SenderResource.h>
@@ -66,10 +67,13 @@ public:
      *
      * @param descriptor Structure that defines all initial configuration for a given transport.
      * @param properties Optional policy to specify additional parameters for the created transport.
+     * @param max_msg_size_no_frag Optional parameter that will allow to skip 65500 KB (s_maximumMessageSize) maxMessageSize limit.
+     * during the transport initialization.
      */
     bool RegisterTransport(
             const fastdds::rtps::TransportDescriptorInterface* descriptor,
-            const fastrtps::rtps::PropertyPolicy* properties = nullptr);
+            const fastrtps::rtps::PropertyPolicy* properties = nullptr,
+            const uint32_t& max_msg_size_no_frag = 0);
 
     /**
      * Walk over the list of transports, opening every possible channel that can send through
@@ -79,6 +83,16 @@ public:
     bool build_send_resources(
             fastdds::rtps::SendResourceList&,
             const Locator_t& locator);
+
+    /**
+     * Walk over the list of transports, opening every possible channel that can send through
+     * the locators contained in @param locator_selector_entry and returning a vector of Sender Resources associated with it.
+     * @param locator_selector_entry LocatorSelectorEntry containing metadata and the locators through which to send.
+     * @return true if at least one send resource was created, false otherwise.
+     */
+    bool build_send_resources(
+            fastdds::rtps::SendResourceList&,
+            const LocatorSelectorEntry& locator_selector_entry);
 
     /**
      * Walk over the list of transports, opening every possible channel that we can listen to
@@ -102,7 +116,7 @@ public:
      * to the corresponding local address if allowed by both local and remote transports.
      *
      * @param [in]  remote_locator Locator to be converted.
-     * @param [out] result_locator Converted locator.
+     * @param [in, out] result_locator Converted locator.
      * @param [in]  remote_network_config Remote network configuration.
      *
      * @return false if the input locator is not supported/allowed by any of the registered transports,
@@ -112,6 +126,38 @@ public:
             const Locator_t& remote_locator,
             Locator_t& result_locator,
             const NetworkConfigSet_t& remote_network_config) const;
+
+    /**
+     * Transform a remote locator into a locator optimized for local communications.
+     *
+     * Conversion is only performed if the remote locator originates from a Fast-DDS entity,
+     * and if allowed by both local and remote transports.
+     *
+     * @param [in]  remote_locator Locator to be converted.
+     * @param [in, out] result_locator Converted locator.
+     * @param [in]  remote_network_config Remote network configuration.
+     * @param [in]  is_fastdds_local Whether the remote locator is from a Fast-DDS entity
+     *                               created in this host (from where this method is called).
+     *
+     * @return false if the input locator is not supported/allowed by any of the registered transports,
+     *         true otherwise.
+     */
+    bool transform_remote_locator(
+            const Locator_t& remote_locator,
+            Locator_t& result_locator,
+            const NetworkConfigSet_t& remote_network_config,
+            bool is_fastdds_local) const;
+
+    /**
+     * Must report whether the given locator is supported by at least one of the registered transports.
+     *
+     * @param [in]  locator Locator to check if supported.
+     *
+     * @return false if the input locator is not supported by any of the registered transports,
+     *         true otherwise.
+     */
+    bool is_locator_supported(
+            const Locator_t& locator) const;
 
     /**
      * Must report whether the given locator is allowed by at least one of the registered transports.
@@ -134,6 +180,20 @@ public:
      */
     bool is_locator_remote_or_allowed(
             const Locator_t& locator) const;
+
+    /**
+     * Must report whether the given locator is remote, or allowed by at least one of the registered transports.
+     *
+     * @param [in]  locator Locator to check if remote or allowed.
+     * @param [in]  is_fastdds_local Whether the locator is from a Fast-DDS entity
+     *                               created in this host (from where this method is called).
+     *
+     * @return false if the input locator is not remote, nor supported/allowed by any of the registered transports,
+     *         true otherwise.
+     */
+    bool is_locator_remote_or_allowed(
+            const Locator_t& locator,
+            bool is_fastdds_local) const;
 
     /**
      * Perform the locator selection algorithm.
@@ -223,18 +283,15 @@ public:
      * Add locators to the default unicast configuration.
      * */
     bool getDefaultUnicastLocators(
-            uint32_t domain_id,
             LocatorList_t& locators,
-            const RTPSParticipantAttributes& m_att) const;
+            uint32_t port) const;
 
     /**
      * Fill the locator with the default unicast configuration.
      * */
     bool fill_default_locator_port(
-            uint32_t domain_id,
             Locator_t& locator,
-            const RTPSParticipantAttributes& m_att,
-            bool is_multicast) const;
+            uint32_t port) const;
 
     /**
      * Shutdown method to close the connections of the transports.
@@ -245,6 +302,31 @@ public:
      * Re-scan network interfaces
      */
     void update_network_interfaces();
+
+    /**
+     * Remove the given participants from the send resource list
+     *
+     * @param send_resource_list List of send resources associated to the local participant.
+     * @param remote_participant_locators List of locators associated to the remote participant.
+     * @param participant_initial_peers List of locators of the initial peers of the local participant.
+     */
+    void remove_participant_associated_send_resources(
+            fastdds::rtps::SendResourceList& send_resource_list,
+            const LocatorList_t& remote_participant_locators,
+            const LocatorList_t& participant_initial_peers) const;
+
+    /**
+     * Returns transports' netmask filter information (transport's netmask filter kind and allowlist).
+     */
+    std::vector<fastdds::rtps::TransportNetmaskFilterInfo> netmask_filter_info() const;
+
+    /**
+     * Calculate well-known ports.
+     */
+    uint16_t calculate_well_known_port(
+            uint32_t domain_id,
+            const RTPSParticipantAttributes& att,
+            bool is_multicast) const;
 
 private:
 
@@ -262,14 +344,6 @@ private:
 
     // Mask using transport kinds to indicate whether the transports allows localhost
     NetworkConfigSet_t network_configuration_;
-
-    /**
-     * Calculate well-known ports.
-     */
-    uint16_t calculate_well_known_port(
-            uint32_t domain_id,
-            const RTPSParticipantAttributes& att,
-            bool is_multicast) const;
 };
 
 } // namespace rtps

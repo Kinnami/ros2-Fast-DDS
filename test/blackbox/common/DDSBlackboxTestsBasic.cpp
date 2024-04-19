@@ -477,8 +477,10 @@ TEST(DDSBasic, PidRelatedSampleIdentity)
 TEST(DDSBasic, IgnoreParticipant)
 {
 
-    struct IgnoringDomainParticipantListener : public DomainParticipantListener
+    class IgnoringDomainParticipantListener : public DomainParticipantListener
     {
+    public:
+
         std::atomic_int num_matched{0};
         std::atomic_int num_ignored{0};
 
@@ -505,6 +507,9 @@ TEST(DDSBasic, IgnoreParticipant)
             }
         }
 
+    private:
+
+        using DomainParticipantListener::on_participant_discovery;
     };
     // Set DomainParticipantFactory to create disabled entities
     DomainParticipantFactoryQos factory_qos;
@@ -694,7 +699,7 @@ TEST(DDSBasic, participant_ignore_local_endpoints_two_participants)
     EXPECT_TRUE(samples.empty());
 
     // Wait for reception
-    EXPECT_EQ(reader.block_for_all(std::chrono::seconds(1)), 5);
+    EXPECT_EQ(reader.block_for_all(std::chrono::seconds(1)), 5u);
 }
 
 /**

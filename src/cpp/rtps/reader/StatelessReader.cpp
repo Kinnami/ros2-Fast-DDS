@@ -21,14 +21,16 @@
 #include <mutex>
 #include <thread>
 
-#include <fastdds/rtps/reader/StatelessReader.h>
-#include <fastdds/rtps/history/ReaderHistory.h>
-#include <fastdds/rtps/reader/ReaderListener.h>
 #include <fastdds/dds/log/Log.hpp>
-#include <fastdds/rtps/common/CacheChange.h>
 #include <fastdds/rtps/builtin/BuiltinProtocols.h>
 #include <fastdds/rtps/builtin/liveliness/WLP.h>
+#include <fastdds/rtps/common/CacheChange.h>
+#include <fastdds/rtps/common/VendorId_t.hpp>
+#include <fastdds/rtps/history/ReaderHistory.h>
+#include <fastdds/rtps/reader/ReaderListener.h>
+#include <fastdds/rtps/reader/StatelessReader.h>
 #include <fastdds/rtps/writer/LivelinessManager.h>
+
 #include <rtps/participant/RTPSParticipantImpl.h>
 #include <rtps/DataSharing/DataSharingListener.hpp>
 #include <rtps/DataSharing/ReaderPool.hpp>
@@ -708,12 +710,33 @@ bool StatelessReader::processDataFragMsg(
                 {
                     if (work_change->sequenceNumber < change_to_add->sequenceNumber)
                     {
+                        SequenceNumber_t updated_seq = work_change->sequenceNumber;
+                        SequenceNumber_t previous_seq{ 0, 0 };
+                        previous_seq = update_last_notified(writer_guid, updated_seq);
+
+                        // Notify lost samples
+                        auto listener = getListener();
+                        if (listener != nullptr)
+                        {
+                            if (SequenceNumber_t{ 0, 0 } != previous_seq)
+                            {
+                                assert(previous_seq < updated_seq);
+                                uint64_t tmp = (updated_seq - previous_seq).to64long();
+                                int32_t lost_samples =
+                                        tmp > static_cast<uint64_t>(std::numeric_limits<int32_t>::max()) ?
+                                        std::numeric_limits<int32_t>::max() : static_cast<int32_t>(tmp);
+                                assert (0 < lost_samples);
+                                listener->on_sample_lost(this, lost_samples);
+                            }
+                        }
+
                         // Pending change should be dropped. Check if it can be reused
                         if (sampleSize <= work_change->serializedPayload.max_size)
                         {
                             // Sample fits inside pending change. Reuse it.
                             work_change->copy_not_memcpy(change_to_add);
                             work_change->serializedPayload.length = sampleSize;
+                            work_change->instanceHandle.clear();
                             work_change->setFragmentSize(change_to_add->getFragmentSize(), true);
                         }
                         else
@@ -739,6 +762,7 @@ bool StatelessReader::processDataFragMsg(
                         {
                             work_change->copy_not_memcpy(change_to_add);
                             work_change->serializedPayload.length = sampleSize;
+                            work_change->instanceHandle.clear();
                             work_change->setFragmentSize(change_to_add->getFragmentSize(), true);
                         }
                     }
@@ -748,6 +772,12 @@ bool StatelessReader::processDataFragMsg(
                 CacheChange_t* change_completed = nullptr;
                 if (work_change != nullptr)
                 {
+                    // Set the instanceHandle only when fragment number 1 is received
+                    if (!work_change->instanceHandle.isDefined() && fragmentStartingNum == 1)
+                    {
+                        work_change->instanceHandle = change_to_add->instanceHandle;
+                    }
+
                     if (work_change->add_fragments(change_to_add->serializedPayload, fragmentStartingNum,
                             fragmentsInSubmessage))
                     {
@@ -798,7 +828,8 @@ bool StatelessReader::processHeartbeatMsg(
         const SequenceNumber_t& /*firstSN*/,
         const SequenceNumber_t& /*lastSN*/,
         bool /*finalFlag*/,
-        bool /*livelinessFlag*/)
+        bool /*livelinessFlag*/,
+        eprosima::fastdds::rtps::VendorId_t /*origin_vendor_id*/)
 {
     return true;
 }
@@ -806,7 +837,8 @@ bool StatelessReader::processHeartbeatMsg(
 bool StatelessReader::processGapMsg(
         const GUID_t& /*writerGUID*/,
         const SequenceNumber_t& /*gapStart*/,
-        const SequenceNumberSet_t& /*gapList*/)
+        const SequenceNumberSet_t& /*gapList*/,
+        eprosima::fastdds::rtps::VendorId_t /*origin_vendor_id*/)
 {
     return true;
 }

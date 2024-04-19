@@ -364,7 +364,7 @@ private:
     rtps::ThreadSettings thread_settings_;
 };
 
-std::shared_ptr<LogResources> get_log_resources()
+const std::shared_ptr<LogResources>& get_log_resources()
 {
     static std::shared_ptr<LogResources> instance = std::make_shared<LogResources>();
     return instance;
@@ -474,11 +474,7 @@ void LogConsumer::print_header(
 
     std::string white = (color) ? C_B_WHITE : "";
 
-    std::string kind = (entry.kind == Log::Kind::Error) ? "Error" :
-            (entry.kind == Log::Kind::Warning) ? "Warning" :
-            (entry.kind == Log::Kind::Info) ? "Info" : "";
-
-    stream << c_b_color << "[" << white << entry.context.category << c_b_color << " " << kind << "] ";
+    stream << c_b_color << "[" << white << entry.context.category << c_b_color << " " << entry.kind << "] ";
 }
 
 void LogConsumer::print_context(

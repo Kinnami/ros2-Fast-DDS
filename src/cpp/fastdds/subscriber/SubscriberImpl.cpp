@@ -31,9 +31,11 @@
 #include <fastdds/dds/topic/TypeSupport.hpp>
 #include <fastdds/utils/QosConverters.hpp>
 
+#include <fastdds/dds/log/Log.hpp>
 #include <fastdds/rtps/common/Property.h>
 #include <fastdds/rtps/participant/RTPSParticipant.h>
-#include <fastdds/dds/log/Log.hpp>
+
+#include <rtps/network/utils/netmask_filter.hpp>
 
 #include <fastrtps/attributes/SubscriberAttributes.h>
 
@@ -207,6 +209,24 @@ DataReader* SubscriberImpl::create_datareader(
     if (!DataReaderImpl::check_qos_including_resource_limits(qos, type_support))
     {
         return nullptr;
+    }
+
+    // Check netmask filtering preconditions
+    if (nullptr != rtps_participant_)
+    {
+        std::vector<fastdds::rtps::TransportNetmaskFilterInfo> netmask_filter_info =
+                rtps_participant_->get_netmask_filter_info();
+        std::string error_msg;
+        if (!fastdds::rtps::network::netmask_filter::check_preconditions(netmask_filter_info,
+                qos.endpoint().ignore_non_matching_locators,
+                error_msg) ||
+                !fastdds::rtps::network::netmask_filter::check_preconditions(netmask_filter_info,
+                qos.endpoint().external_unicast_locators, error_msg))
+        {
+            EPROSIMA_LOG_ERROR(SUBSCRIBER,
+                    "Failed to create reader -> " << error_msg);
+            return nullptr;
+        }
     }
 
     topic->get_impl()->reference();
@@ -667,8 +687,7 @@ bool SubscriberImpl::can_be_deleted() const
 
 #ifdef FASTDDS_STATISTICS
 bool SubscriberImpl::get_monitoring_status(
-        const uint32_t& status_id,
-        statistics::rtps::DDSEntityStatus*& status,
+        statistics::MonitorServiceData& status,
         const fastrtps::rtps::GUID_t& entity_guid)
 {
     bool ret = false;
@@ -679,12 +698,21 @@ bool SubscriberImpl::get_monitoring_status(
         {
             if (reader->guid() == entity_guid)
             {
-                switch (status_id)
+                switch (status._d())
                 {
                     case statistics::INCOMPATIBLE_QOS:
                     {
-                        reader->get_requested_incompatible_qos_status(*static_cast<RequestedIncompatibleQosStatus*>(
-                                    status));
+                        RequestedIncompatibleQosStatus incompatible_qos_status;
+                        reader->get_requested_incompatible_qos_status(incompatible_qos_status);
+                        status.incompatible_qos_status().total_count(incompatible_qos_status.total_count);
+                        status.incompatible_qos_status().last_policy_id(incompatible_qos_status.last_policy_id);
+                        for (auto& qos : incompatible_qos_status.policies)
+                        {
+                            statistics::QosPolicyCount_s count;
+                            count.count(qos.count);
+                            count.policy_id(qos.policy_id);
+                            status.incompatible_qos_status().policies().push_back(count);
+                        }
                         ret = true;
                         break;
                     }
@@ -697,25 +725,40 @@ bool SubscriberImpl::get_monitoring_status(
                        }*/
                     case statistics::LIVELINESS_CHANGED:
                     {
-                        reader->get_liveliness_changed_status(*static_cast<LivelinessChangedStatus*>(status));
+                        LivelinessChangedStatus liveliness_changed_status;
+                        reader->get_liveliness_changed_status(liveliness_changed_status);
+                        status.liveliness_changed_status().alive_count(liveliness_changed_status.alive_count);
+                        status.liveliness_changed_status().not_alive_count(liveliness_changed_status.not_alive_count);
+                        std::memcpy(
+                            status.liveliness_changed_status().last_publication_handle().data(),
+                            liveliness_changed_status.last_publication_handle.value,
+                            16);
                         ret = true;
                         break;
                     }
                     case statistics::DEADLINE_MISSED:
                     {
-                        reader->get_requested_deadline_missed_status(*static_cast<DeadlineMissedStatus*>(status));
+                        DeadlineMissedStatus deadline_missed_status;
+                        reader->get_requested_deadline_missed_status(deadline_missed_status);
+                        status.deadline_missed_status().total_count(deadline_missed_status.total_count);
+                        std::memcpy(
+                            status.deadline_missed_status().last_instance_handle().data(),
+                            deadline_missed_status.last_instance_handle.value,
+                            16);
                         ret = true;
                         break;
                     }
                     case statistics::SAMPLE_LOST:
                     {
-                        reader->get_sample_lost_status(*static_cast<SampleLostStatus*>(status));
+                        SampleLostStatus sample_lost_status;
+                        reader->get_sample_lost_status(sample_lost_status);
+                        status.sample_lost_status().total_count(sample_lost_status.total_count);
                         ret = true;
                         break;
                     }
                     default:
                     {
-                        EPROSIMA_LOG_ERROR(SUBSCRIBER, "Queried status not available for this entity " << status_id);
+                        EPROSIMA_LOG_ERROR(SUBSCRIBER, "Queried status not available for this entity " << status._d());
                         break;
                     }
                 }
