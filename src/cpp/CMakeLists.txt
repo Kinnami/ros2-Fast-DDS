@@ -97,6 +97,7 @@ set(${PROJECT_NAME}_source_files
     fastrtps_deprecated/subscriber/SubscriberHistory.cpp
     fastdds/publisher/DataWriter.cpp
     fastdds/publisher/DataWriterImpl.cpp
+    fastdds/publisher/amishare_publisher.cpp
     fastdds/publisher/DataWriterHistory.cpp
     fastdds/topic/ContentFilteredTopic.cpp
     fastdds/topic/ContentFilteredTopicImpl.cpp
@@ -501,7 +502,7 @@ target_include_directories(${PROJECT_NAME} PUBLIC
     $<$<BOOL:${ANDROID}>:${ANDROID_IFADDRS_INCLUDE_DIR}>
     ${THIRDPARTY_BOOST_INCLUDE_DIR}
     ${PROJECT_SOURCE_DIR}/thirdparty/taocpp-pegtl
-    /home/teresa/AmiShare/ReplicatingPeer/src/objc/libBoxOSStore/TST
+    $ENV{AMISHARE_BASE}/ReplicatingPeer/src/objc/libBoxOSStore/TST
     )
 
 # No need to expose linked libs when target is a shared library on MSVC.
@@ -519,7 +520,7 @@ target_link_libraries(${PROJECT_NAME} ${PRIVACY} fastcdr foonathan_memory
     $<$<BOOL:${WIN32}>:iphlpapi$<SEMICOLON>Shlwapi>
     ${THIRDPARTY_BOOST_LINK_LIBS}
     PRIVATE eProsima_atomic
-    /home/teresa/AmiShare/lib/Linux/x86_64-ubuntu-22_04/libBoxOSStoreOBC.so.0
+    $ENV{AMISHARE_BASE}/lib/$ENV{AMISHARE_TARGET}/$ENV{AMISHARE_TARGET_BINARY}/libBoxOSStoreOBC.so.0
     )
 
 if(MSVC OR MSVC_IDE)

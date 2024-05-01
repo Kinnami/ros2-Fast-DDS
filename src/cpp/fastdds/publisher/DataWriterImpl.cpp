@@ -60,6 +60,9 @@
 #include <statistics/types/monitorservice_types.h>
 #endif //FASTDDS_STATISTICS
 
+#include "fastdds/dds/publisher/amishare_publisher.h"
+#include <iostream>
+
 using namespace eprosima::fastrtps;
 using namespace eprosima::fastrtps::rtps;
 using namespace std::chrono;
@@ -588,9 +591,9 @@ ReturnCode_t DataWriterImpl::discard_loan(
 bool DataWriterImpl::amishare_write(void* data)
 {
     PayloadInfo_t payload;
-    bool was_loaned = check_and_remove_loan(data, payload);
-    if (!was_loaned)
-    {
+    //bool was_loaned = check_and_remove_loan(data, payload);
+    //if (!was_loaned)
+    //{
         if (!get_free_payload_from_pool(type_->getSerializedSizeProvider(data), payload))
         {
             return ReturnCode_t::RETCODE_OUT_OF_RESOURCES;
@@ -605,23 +608,20 @@ bool DataWriterImpl::amishare_write(void* data)
 
         unsigned char* buffer = payload.payload.data;
         int length = payload.payload.length;
-        std::cout << "TEBD: starting object create in data writer\n";
         const char** args;
         args = new const char*[3];
         std::string file = "/" + getTopicName();
         args[0] = file.c_str();
-        std::cout << "TEBD: writing buffer with length " << length << "\n";
         std::string buf(reinterpret_cast<char const*>(buffer), length);
         args[1] = buf.c_str();
         std::string len = std::to_string(length);
         args[2] = len.c_str();
         object_update(m_poObjectCreate, 3, args);
-        std::cout << "TEBD: finished object create in data writer\n";
         delete[] args;
+        return_payload_to_pool(payload);
     
         create_new_change(ALIVE, data);
-       //write(data, reinterpret_cast<unsigned char*>(payload.payload.data), payload.payload.length);
-    }
+    //}
     return ReturnCode_t::RETCODE_OK;
 }
 
@@ -2274,3 +2274,4 @@ std::string DataWriterImpl::getTopicName()
 } // namespace dds
 } // namespace fastdds
 } // namespace eprosima
+
