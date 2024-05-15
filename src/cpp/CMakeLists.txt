@@ -98,6 +98,7 @@ set(${PROJECT_NAME}_source_files
     fastdds/publisher/DataWriter.cpp
     fastdds/publisher/DataWriterImpl.cpp
     fastdds/publisher/amishare_publisher.cpp
+    fastdds/subscriber/amishare_subscriber.cpp
     fastdds/publisher/DataWriterHistory.cpp
     fastdds/topic/ContentFilteredTopic.cpp
     fastdds/topic/ContentFilteredTopicImpl.cpp

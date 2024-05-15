@@ -106,10 +106,12 @@ DataReader* Subscriber::create_datareader(
         TopicDescription* topic,
         const DataReaderQos& reader_qos,
         DataReaderListener* listener,
+        bool use_amishare,
         const StatusMask& mask,
         std::shared_ptr<fastrtps::rtps::IPayloadPool> payload_pool)
 {
-    return impl_->create_datareader(topic, reader_qos, listener, mask, payload_pool);
+if (use_amishare) std::cout << "TEBD: using amishare in subscriber create_datareader\n";
+    return impl_->create_datareader(topic, reader_qos, listener, mask, payload_pool, use_amishare);
 }
 
 DataReader* Subscriber::create_datareader_with_profile(

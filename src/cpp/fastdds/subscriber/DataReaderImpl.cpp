@@ -108,7 +108,8 @@ DataReaderImpl::DataReaderImpl(
         TopicDescription* topic,
         const DataReaderQos& qos,
         DataReaderListener* listener,
-        std::shared_ptr<fastrtps::rtps::IPayloadPool> payload_pool)
+        std::shared_ptr<fastrtps::rtps::IPayloadPool> payload_pool, 
+        bool use_amishare)
     : subscriber_(s)
     , type_(type)
     , topic_(topic)
@@ -137,9 +138,13 @@ DataReaderImpl::DataReaderImpl(
         payload_pool_ = payload_pool;
     }
 
-    m_poObjectCreate = new void*;
-    *m_poObjectCreate = NULL;
-    object_create_init(m_poObjectCreate);
+    if (use_amishare)
+    {
+        std::cout << "TEBD: creating amishare reader\n";
+        m_poObjectCreate = new void*;
+        *m_poObjectCreate = NULL;
+        object_create_init(m_poObjectCreate);
+    }
 }
 
 ReturnCode_t DataReaderImpl::enable()

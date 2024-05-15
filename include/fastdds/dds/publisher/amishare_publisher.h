@@ -21,6 +21,7 @@ AmiSharePublisher()
     , publisher_(nullptr)
     , topic_(nullptr)
     , writer_(nullptr)
+    , type_(nullptr)
 {}
 bool create_publisher(void* type, std::string topic_name, std::string topic_type);
 bool publish(void* data);

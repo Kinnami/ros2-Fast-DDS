@@ -94,7 +94,7 @@ bool HelloWorldSubscriber::init()
     rqos.reliability().kind = RELIABLE_RELIABILITY_QOS;
     rqos.durability().kind = TRANSIENT_LOCAL_DURABILITY_QOS;
 
-    reader_ = subscriber_->create_datareader(topic_, rqos, &listener_);
+    reader_ = subscriber_->create_datareader(topic_, rqos, &listener_, true);
 
     if (reader_ == nullptr)
     {

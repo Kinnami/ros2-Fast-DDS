@@ -52,11 +52,13 @@ public:
     efd::DataReaderImpl* create_datareader_impl(
             const efd::TypeSupport& type,
             efd::TopicDescription* topic,
+            bool use_amishare,
             const efd::DataReaderQos& qos,
             efd::DataReaderListener* listener,
             std::shared_ptr<fastrtps::rtps::IPayloadPool> payload_pool) override
     {
-        return new DataReaderImpl(this, type, topic, qos, listener, payload_pool, statistics_listener_);
+    std::cout << "TEBD: calling create_datareader_impl in  statistics\n";
+        return new DataReaderImpl(this, type, topic, qos, listener, use_amishare, payload_pool, statistics_listener_);
     }
 
 private:

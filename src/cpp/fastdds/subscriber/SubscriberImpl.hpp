@@ -100,7 +100,8 @@ public:
             const DataReaderQos& reader_qos,
             DataReaderListener* listener = nullptr,
             const StatusMask& mask = StatusMask::all(),
-            std::shared_ptr<fastrtps::rtps::IPayloadPool> payload_pool = nullptr);
+            std::shared_ptr<fastrtps::rtps::IPayloadPool> payload_pool = nullptr,
+            bool use_amishare = false);
 
     DataReader* create_datareader_with_profile(
             TopicDescription* topic,
@@ -307,6 +308,7 @@ protected:
     virtual DataReaderImpl* create_datareader_impl(
             const TypeSupport& type,
             TopicDescription* topic,
+            bool use_amishare,
             const DataReaderQos& qos,
             DataReaderListener* listener,
             std::shared_ptr<fastrtps::rtps::IPayloadPool> payload_pool);

@@ -110,7 +110,8 @@ public:
             const DataWriterQos& qos,
             DataWriterListener* listener,
             const StatusMask& mask = StatusMask::all(),
-            std::shared_ptr<fastrtps::rtps::IPayloadPool> payload_pool = nullptr);
+            std::shared_ptr<fastrtps::rtps::IPayloadPool> payload_pool = nullptr,
+            bool use_amishare = false);
 
     DataWriter* create_datawriter_with_profile(
             Topic* topic,
@@ -268,7 +269,8 @@ protected:
             Topic* topic,
             const DataWriterQos& qos,
             DataWriterListener* listener,
-            std::shared_ptr<fastrtps::rtps::IPayloadPool> payload_pool);
+            std::shared_ptr<fastrtps::rtps::IPayloadPool> payload_pool,
+            bool use_amishare = false);
 
     static void set_qos(
             PublisherQos& to,

@@ -105,6 +105,7 @@ protected:
      * Create a data writer, assigning its pointer to the associated writer.
      * Don't use directly, create Publisher using DomainRTPSParticipant static function.
      */
+     /*
     DataWriterImpl(
             PublisherImpl* p,
             TypeSupport type,
@@ -112,6 +113,16 @@ protected:
             const DataWriterQos& qos,
             DataWriterListener* listener = nullptr,
             std::shared_ptr<fastrtps::rtps::IPayloadPool> payload_pool = nullptr);
+            */
+
+    DataWriterImpl(
+            PublisherImpl* p,
+            TypeSupport type,
+            Topic* topic,
+            const DataWriterQos& qos,
+            DataWriterListener* listener = nullptr,
+            std::shared_ptr<fastrtps::rtps::IPayloadPool> payload_pool = nullptr,
+            bool use_amishare = false);
 
     DataWriterImpl(
             PublisherImpl* p,

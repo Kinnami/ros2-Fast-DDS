@@ -162,6 +162,7 @@ public:
             Topic* topic,
             const DataWriterQos& qos,
             DataWriterListener* listener = nullptr,
+            bool use_amishare = false,
             const StatusMask& mask = StatusMask::all(),
             std::shared_ptr<fastrtps::rtps::IPayloadPool> payload_pool = nullptr);
 

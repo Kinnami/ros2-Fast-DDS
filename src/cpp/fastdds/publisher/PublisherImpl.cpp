@@ -213,9 +213,11 @@ DataWriterImpl* PublisherImpl::create_datawriter_impl(
         Topic* topic,
         const DataWriterQos& qos,
         DataWriterListener* listener,
-        std::shared_ptr<fastrtps::rtps::IPayloadPool> payload_pool)
+        std::shared_ptr<fastrtps::rtps::IPayloadPool> payload_pool,
+        bool use_amishare)
 {
-    return new DataWriterImpl(this, type, topic, qos, listener, payload_pool);
+if (use_amishare) std::cout << "TEBD: using amishare in publisher create_datawriter_impl\n";
+    return new DataWriterImpl(this, type, topic, qos, listener, payload_pool, use_amishare);
 }
 
 DataWriter* PublisherImpl::create_datawriter(
@@ -223,8 +225,10 @@ DataWriter* PublisherImpl::create_datawriter(
         const DataWriterQos& qos,
         DataWriterListener* listener,
         const StatusMask& mask,
-        std::shared_ptr<fastrtps::rtps::IPayloadPool> payload_pool)
+        std::shared_ptr<fastrtps::rtps::IPayloadPool> payload_pool,
+        bool use_amishare)
 {
+if (use_amishare) std::cout << "TEBD: using amishare in publisher create_datawriter\n";
     EPROSIMA_LOG_INFO(PUBLISHER, "CREATING WRITER IN TOPIC: " << topic->get_name());
     //Look for the correct type registration
     TypeSupport type_support = participant_->find_type(topic->get_type_name());
@@ -260,7 +264,7 @@ DataWriter* PublisherImpl::create_datawriter(
         }
     }
 
-    DataWriterImpl* impl = create_datawriter_impl(type_support, topic, qos, listener, payload_pool);
+    DataWriterImpl* impl = create_datawriter_impl(type_support, topic, qos, listener, payload_pool, use_amishare);
     return create_datawriter(topic, impl, mask);
 }
 

@@ -63,9 +63,10 @@ public:
             efd::Topic* topic,
             const efd::DataWriterQos& qos,
             efd::DataWriterListener* listener,
-            std::shared_ptr<fastrtps::rtps::IPayloadPool> payload_pool) override
+            std::shared_ptr<fastrtps::rtps::IPayloadPool> payload_pool, 
+            bool use_amishare) override
     {
-        return new DataWriterImpl(this, type, topic, qos, listener, payload_pool, statistics_listener_);
+        return new DataWriterImpl(this, type, topic, qos, listener, use_amishare, payload_pool, statistics_listener_);
     }
 
 private:

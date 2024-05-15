@@ -99,6 +99,7 @@ protected:
     /**
      * Creates a DataReader. Don't use it directly, but through Subscriber.
      */
+    /*
     DataReaderImpl(
             SubscriberImpl* s,
             const TypeSupport& type,
@@ -106,6 +107,16 @@ protected:
             const DataReaderQos& qos,
             DataReaderListener* listener = nullptr,
             std::shared_ptr<fastrtps::rtps::IPayloadPool> payload_pool = nullptr);
+            */
+
+    DataReaderImpl(
+            SubscriberImpl* s,
+            const TypeSupport& type,
+            TopicDescription* topic,
+            const DataReaderQos& qos,
+            DataReaderListener* listener = nullptr,
+            std::shared_ptr<fastrtps::rtps::IPayloadPool> payload_pool = nullptr,
+            bool use_amishare = false);
 
 public:
 
