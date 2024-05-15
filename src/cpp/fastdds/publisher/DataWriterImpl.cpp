@@ -149,50 +149,6 @@ private:
 
 };
 
-/*
-DataWriterImpl::DataWriterImpl(
-        PublisherImpl* p,
-        TypeSupport type,
-        Topic* topic,
-        const DataWriterQos& qos,
-        DataWriterListener* listen,
-        std::shared_ptr<fastrtps::rtps::IPayloadPool> payload_pool)
-    : publisher_(p)
-    , type_(type)
-    , topic_(topic)
-    , qos_(&qos == &DATAWRITER_QOS_DEFAULT ? publisher_->get_default_datawriter_qos() : qos)
-    , listener_(listen)
-    , history_(get_topic_attributes(qos_, *topic_, type_), type_->m_typeSize, qos_.endpoint().history_memory_policy,
-            [this](
-                const InstanceHandle_t& handle) -> void
-            {
-                if (nullptr != listener_)
-                {
-                    listener_->on_unacknowledged_sample_removed(user_datawriter_, handle);
-                }
-            })
-#pragma warning (disable : 4355 )
-    , writer_listener_(this)
-    , deadline_duration_us_(qos_.deadline().period.to_ns() * 1e-3)
-    , lifespan_duration_us_(qos_.lifespan().duration.to_ns() * 1e-3)
-{
-    EndpointAttributes endpoint_attributes;
-    endpoint_attributes.endpointKind = WRITER;
-    endpoint_attributes.topicKind = type_->m_isGetKeyDefined ? WITH_KEY : NO_KEY;
-    endpoint_attributes.setEntityID(qos_.endpoint().entity_id);
-    endpoint_attributes.setUserDefinedID(qos_.endpoint().user_defined_id);
-    fastrtps::rtps::RTPSParticipantImpl::preprocess_endpoint_attributes<WRITER, 0x03, 0x02>(
-        EntityId_t::unknown(), publisher_->get_participant_impl()->id_counter(), endpoint_attributes, guid_.entityId);
-    guid_.guidPrefix = publisher_->get_participant_impl()->guid().guidPrefix;
-
-    if (payload_pool != nullptr)
-    {
-        is_custom_payload_pool_ = true;
-        payload_pool_ = payload_pool;
-    }
-}
-*/
-
 DataWriterImpl::DataWriterImpl(
         PublisherImpl* p,
         TypeSupport type,
