@@ -9,8 +9,10 @@ namespace fastdds {
 namespace dds {
 
 //bool AmiShareSubscriber::create_subscriber(void* type, std::string topic_name, std::string topic_type, void (*f)(void*))
-bool AmiShareSubscriber::create_subscriber(void* type, std::string topic_name, std::string topic_type)
+bool AmiShareSubscriber::create_subscriber(void* message_value, void* type, std::string topic_name, std::string topic_type)
 {
+    data_ = message_value;
+
     //AmiShareSubscriber::subscriber_callback_ = f;
     DomainParticipantQos pqos;
     pqos.wire_protocol().builtin.discovery_config.discoveryProtocol = DiscoveryProtocol_t::SIMPLE;
@@ -49,17 +51,19 @@ bool AmiShareSubscriber::create_subscriber(void* type, std::string topic_name, s
     rqos.reliability().kind = RELIABLE_RELIABILITY_QOS;
     rqos.durability().kind = TRANSIENT_LOCAL_DURABILITY_QOS;
 
-    reader_ = subscriber_->create_datareader(topic_, rqos, &listener_); 
+    reader_ = subscriber_->create_datareader(topic_, rqos, &listener_, true); 
     if (reader_ == nullptr)
         return false;
 
     return true;
 }
 
+void* AmiShareSubscriber::subscriber_callback_;
+void* AmiShareSubscriber::data_;
+
 /*
 void AmiShareSubscriber::SubListener::on_data_available(eprosima::fastdds::dds::DataReader* reader) 
 {
-        std::cout << "TEBD: data available\n";
         void *data;
         SampleInfo info;
         reader->amishare_take_next_sample(data, &info);

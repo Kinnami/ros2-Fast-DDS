@@ -774,7 +774,6 @@ ReturnCode_t DataReaderImpl::amishare_take_next_sample(
     int datareturnsize;
 
     //take_next_sample(data, info, datareturn, datareturnsize);
-    std::cout << "TEBD: starting object read in data reader\n";
     const char** args;
     args = new const char*[1];
     std::string file = "/" + getTopicName();
@@ -788,13 +787,9 @@ ReturnCode_t DataReaderImpl::amishare_take_next_sample(
     payload.length = datareturnsize;
 
     std::cout << "TEBD: length " << datareturnsize << "\n";
-    std::cout << "TEBD: payload length " << payload.length << "\n";
-
     std::string str(reinterpret_cast<char*>(*datareturn),  datareturnsize);
     std::cout << "TEBD: object read got " << str << "\n";
-    std::cout << "TEBD: data reader deserializing\n";
     type_->deserialize(&payload, data);
-    std::cout << "TEBD: data reader deserializing done\n";
 
     //free(*datareturn);
     delete datareturn;

@@ -25,10 +25,9 @@ AmiShareSubscriber()
 {}
 
 using Function = void(*)(void*);
-static Function subscriber_callback_; 
-//static void (*subscriber_callback_)(void*); 
+//static Function subscriber_callback_; 
+static void* subscriber_callback_;
 
-//AmiShareSubscriber(void (*f)(void*)) 
 AmiShareSubscriber(Function f) 
     : participant_(nullptr)
     , subscriber_(nullptr)
@@ -36,10 +35,10 @@ AmiShareSubscriber(Function f)
     , reader_(nullptr)
     , type_(nullptr)
 { 
-  subscriber_callback_ = f;
+  subscriber_callback_ = (void*)(f);
 }
 
-bool create_subscriber(void* type, std::string topic_name, std::string topic_type);
+bool create_subscriber(void* message_value, void* type, std::string topic_name, std::string topic_type);
 //bool create_subscriber(void* type, std::string topic_name, std::string topic_type, void (*f)(void*));
 
 private:
@@ -48,6 +47,7 @@ private:
   eprosima::fastdds::dds::Topic* topic_;
   eprosima::fastdds::dds::DataReader* reader_;
   eprosima::fastdds::dds::TypeSupport type_;
+  static void *data_;
 
   class SubListener : public eprosima::fastdds::dds::DataReaderListener
     {
@@ -84,18 +84,12 @@ private:
         void on_data_available(
                 eprosima::fastdds::dds::DataReader* reader) override
         {
-        std::cout << "TEBD: data available\n";
-        void *data;
-        SampleInfo info;
-        reader->amishare_take_next_sample(data, &info);
-        //subscriber_callback_(static_cast<type_->type>(data));
-        AmiShareSubscriber::subscriber_callback_(data);
-
-                    //samples_++;
-                    //const size_t data_size = hello_->data().size();
-                    //std::cout << "Message " << hello_->message() << " " << hello_->index
-                            //<< " RECEIVED With " << data_size << "(bytes) of Data. Dat
-                            //<< (char*)&hello_->data()[data_size - 9] << std::endl;
+            std::cout << "TEBD: data available\n";
+           // void *data;
+            SampleInfo info;
+            reader->amishare_take_next_sample(data_, &info);
+            Function f = reinterpret_cast<Function>(subscriber_callback_);
+            f(data_);
         }
         
         int samples_;

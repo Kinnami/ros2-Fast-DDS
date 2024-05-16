@@ -185,7 +185,6 @@ DataReaderImpl* SubscriberImpl::create_datareader_impl(
         DataReaderListener* listener,
         std::shared_ptr<fastrtps::rtps::IPayloadPool> payload_pool)
 {
-if (use_amishare) std::cout << "TEBD: using amishare in subscriber create_datareader_impl\n";
     return new DataReaderImpl(this, type, topic, qos, listener, payload_pool, use_amishare);
 }
 
@@ -197,7 +196,6 @@ DataReader* SubscriberImpl::create_datareader(
         std::shared_ptr<fastrtps::rtps::IPayloadPool> payload_pool,
         bool use_amishare)
 {
-if (use_amishare) std::cout << "TEBD: using amishare in subscriber create_datareader\n";
     EPROSIMA_LOG_INFO(SUBSCRIBER, "CREATING SUBSCRIBER IN TOPIC: " << topic->get_name());
     //Look for the correct type registration
     TypeSupport type_support = participant_->find_type(topic->get_type_name());
@@ -235,7 +233,6 @@ if (use_amishare) std::cout << "TEBD: using amishare in subscriber create_datare
 
     topic->get_impl()->reference();
 
-if (use_amishare) std::cout << "TEBD: calling create_datareader_impl in subscriber create_datareader\n";
     DataReaderImpl* impl = create_datareader_impl(type_support, topic, use_amishare, qos, listener, payload_pool);
     DataReader* reader = new DataReader(impl, mask);
     impl->user_datareader_ = reader;

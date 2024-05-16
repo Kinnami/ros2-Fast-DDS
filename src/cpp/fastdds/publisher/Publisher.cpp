@@ -120,6 +120,16 @@ if (use_amishare) std::cout << "TEBD: using amishare in publisher create_datawri
     return impl_->create_datawriter(topic, qos, listener, mask, payload_pool, use_amishare);
 }
 
+DataWriter* Publisher::create_datawriter(
+        Topic* topic,
+        const DataWriterQos& qos,
+        DataWriterListener* listener,
+        const StatusMask& mask,
+        std::shared_ptr<fastrtps::rtps::IPayloadPool> payload_pool) 
+{
+    return impl_->create_datawriter(topic, qos, listener, mask, payload_pool);
+}
+
 DataWriter* Publisher::create_datawriter_with_profile(
         Topic* topic,
         const std::string& profile_name,

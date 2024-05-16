@@ -166,6 +166,13 @@ public:
             const StatusMask& mask = StatusMask::all(),
             std::shared_ptr<fastrtps::rtps::IPayloadPool> payload_pool = nullptr);
 
+    RTPS_DllAPI DataWriter* create_datawriter(
+            Topic* topic,
+            const DataWriterQos& qos,
+            DataWriterListener* listener = nullptr,
+            const StatusMask& mask = StatusMask::all(),
+            std::shared_ptr<fastrtps::rtps::IPayloadPool> payload_pool = nullptr);
+
     /**
      * This operation creates a DataWriter. The returned DataWriter will be attached and belongs to the Publisher.
      *

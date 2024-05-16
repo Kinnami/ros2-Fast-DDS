@@ -57,7 +57,6 @@ public:
             efd::DataReaderListener* listener,
             std::shared_ptr<fastrtps::rtps::IPayloadPool> payload_pool) override
     {
-    std::cout << "TEBD: calling create_datareader_impl in  statistics\n";
         return new DataReaderImpl(this, type, topic, qos, listener, use_amishare, payload_pool, statistics_listener_);
     }
 

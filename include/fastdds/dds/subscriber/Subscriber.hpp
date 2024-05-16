@@ -173,6 +173,13 @@ public:
             const StatusMask& mask = StatusMask::all(),
             std::shared_ptr<fastrtps::rtps::IPayloadPool> payload_pool = nullptr);
 
+    RTPS_DllAPI DataReader* create_datareader(
+            TopicDescription* topic,
+            const DataReaderQos& reader_qos,
+            DataReaderListener* listener = nullptr,
+            const StatusMask& mask = StatusMask::all(),
+            std::shared_ptr<fastrtps::rtps::IPayloadPool> payload_pool = nullptr);
+
     /**
      * This operation creates a DataReader. The returned DataReader will be attached and belongs to the Subscriber.
      *

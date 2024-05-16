@@ -49,7 +49,7 @@ bool AmiSharePublisher::create_publisher(void* type, std::string topic_name, std
     wqos.reliability().kind = RELIABLE_RELIABILITY_QOS;
     wqos.publish_mode().kind = ASYNCHRONOUS_PUBLISH_MODE;
 
-    writer_ = publisher_->create_datawriter(topic_, wqos, &listener_); 
+    writer_ = publisher_->create_datawriter(topic_, wqos, &listener_, true); 
     if (writer_ == nullptr)
         return false;
 
