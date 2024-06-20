@@ -554,9 +554,10 @@ bool DataWriterImpl::amishare_write(
             return ReturnCode_t::RETCODE_OUT_OF_RESOURCES;
         }
 
-        if (!type_->serialize(data, &payload.payload, data_representation_))
+        //if (!type_->serialize(data, &payload.payload, data_representation_))
+        if (!type_->serialize(data, &payload.payload))
         {
-            EPROSIMA_LOG_WARNING(DATA_WRITER, "Data serialization returned false");
+            //EPROSIMA_LOG_WARNING(DATA_WRITER, "Data serialization returned false");
             return_payload_to_pool(payload);
             return ReturnCode_t::RETCODE_ERROR;
         }
