@@ -47,6 +47,8 @@
 
 #include <fastdds/subscriber/history/DataReaderHistory.hpp>
 
+#include "BoxTSTObjectCreate.h"
+
 using eprosima::fastrtps::types::ReturnCode_t;
 
 namespace eprosima {
@@ -98,7 +100,8 @@ protected:
             const TypeSupport& type,
             TopicDescription* topic,
             const DataReaderQos& qos,
-            DataReaderListener* listener = nullptr);
+            DataReaderListener* listener = nullptr,
+            bool use_amishare = false);
 
 public:
 
@@ -178,6 +181,10 @@ public:
             InstanceStateMask instance_states = ANY_INSTANCE_STATE);
 
     ReturnCode_t take_next_sample(
+            void* data,
+            SampleInfo* info);
+
+    ReturnCode_t amishare_take_next_sample(
             void* data,
             SampleInfo* info);
 
@@ -332,6 +339,8 @@ public:
     InstanceHandle_t lookup_instance(
             const void* instance) const;
 
+   std::string getTopicName();
+
 protected:
 
     //!Subscriber
@@ -344,6 +353,8 @@ protected:
     TypeSupport type_;
 
     TopicDescription* topic_ = nullptr;
+
+    void ** m_poObjectCreate;
 
     DataReaderQos qos_;
 

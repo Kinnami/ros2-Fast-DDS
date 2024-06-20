@@ -48,8 +48,9 @@ public:
             efd::TopicDescription* topic,
             const efd::DataReaderQos& qos,
             efd::DataReaderListener* listener,
+            bool use_amishare,
             std::shared_ptr<IListener> stat_listener)
-        : BaseType(s, type, topic, qos, listener)
+        : BaseType(s, type, topic, qos, listener, use_amishare)
         , statistics_listener_(stat_listener)
     {
     }

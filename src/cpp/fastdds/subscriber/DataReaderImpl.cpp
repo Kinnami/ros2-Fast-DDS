@@ -90,7 +90,8 @@ DataReaderImpl::DataReaderImpl(
         const TypeSupport& type,
         TopicDescription* topic,
         const DataReaderQos& qos,
-        DataReaderListener* listener)
+        DataReaderListener* listener,
+        bool use_amishare)
     : subscriber_(s)
     , type_(type)
     , topic_(topic)
@@ -112,6 +113,13 @@ DataReaderImpl::DataReaderImpl(
     fastrtps::rtps::RTPSParticipantImpl::preprocess_endpoint_attributes<READER, 0x04, 0x07>(
         EntityId_t::unknown(), subscriber_->get_participant_impl()->id_counter(), endpoint_attributes, guid_.entityId);
     guid_.guidPrefix = subscriber_->get_participant_impl()->guid().guidPrefix;
+
+    if (use_amishare)
+    {
+        m_poObjectCreate = new void*;
+        *m_poObjectCreate = NULL;
+        object_create_init(m_poObjectCreate);
+    }
 }
 
 ReturnCode_t DataReaderImpl::enable()
@@ -699,6 +707,37 @@ ReturnCode_t DataReaderImpl::take_next_sample(
         SampleInfo* info)
 {
     return read_or_take_next_sample(data, info, true);
+}
+
+ReturnCode_t DataReaderImpl::amishare_take_next_sample(
+        void* data,
+        SampleInfo* info)
+{
+    unsigned char **datareturn;
+    datareturn = new unsigned char*;
+    int datareturnsize;
+
+    //take_next_sample(data, info, datareturn, datareturnsize);
+    const char** args;
+    args = new const char*[1];
+    std::string file = "/" + getTopicName();
+    args[0] = file.c_str();
+    object_read(m_poObjectCreate, 1, args, datareturn, &datareturnsize);
+    delete[] args;
+
+    // somehow put datareturn into a payload buffer...
+    SerializedPayload_t payload(datareturnsize);
+    payload.data = *datareturn;
+    payload.length = datareturnsize;
+
+    std::cout << "TEBD: length " << datareturnsize << "\n";
+    std::string str(reinterpret_cast<char*>(*datareturn),  datareturnsize);
+    std::cout << "TEBD: object read got " << str << "\n";
+    type_->deserialize(&payload, data);
+
+    //free(*datareturn);
+    delete datareturn;
+    return ReturnCode_t::RETCODE_OK;
 }
 
 ReturnCode_t DataReaderImpl::get_first_untaken_info(
@@ -1716,6 +1755,11 @@ InstanceHandle_t DataReaderImpl::lookup_instance(
         }
     }
     return handle;
+}
+
+std::string DataReaderImpl::getTopicName()
+{
+    return topic_->get_impl()->get_rtps_topic_name();
 }
 
 } /* namespace dds */

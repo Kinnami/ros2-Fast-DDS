@@ -257,16 +257,18 @@ DataWriterImpl* PublisherImpl::create_datawriter_impl(
         const TypeSupport& type,
         Topic* topic,
         const DataWriterQos& qos,
-        DataWriterListener* listener)
+        DataWriterListener* listener,
+        bool use_amishare)
 {
-    return new DataWriterImpl(this, type, topic, qos, listener);
+    return new DataWriterImpl(this, type, topic, qos, listener, use_amishare);
 }
 
 DataWriter* PublisherImpl::create_datawriter(
         Topic* topic,
         const DataWriterQos& qos,
         DataWriterListener* listener,
-        const StatusMask& mask)
+        const StatusMask& mask,
+        bool use_amishare)
 {
     logInfo(PUBLISHER, "CREATING WRITER IN TOPIC: " << topic->get_name());
     //Look for the correct type registration
@@ -285,7 +287,7 @@ DataWriter* PublisherImpl::create_datawriter(
         return nullptr;
     }
 
-    DataWriterImpl* impl = create_datawriter_impl(type_support, topic, qos, listener);
+    DataWriterImpl* impl = create_datawriter_impl(type_support, topic, qos, listener, use_amishare);
     return create_datawriter(topic, impl, mask);
 }
 

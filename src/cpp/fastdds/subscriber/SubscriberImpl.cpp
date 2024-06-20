@@ -223,17 +223,19 @@ ReturnCode_t SubscriberImpl::set_listener(
 DataReaderImpl* SubscriberImpl::create_datareader_impl(
         const TypeSupport& type,
         TopicDescription* topic,
+        bool use_amishare,
         const DataReaderQos& qos,
         DataReaderListener* listener)
 {
-    return new DataReaderImpl(this, type, topic, qos, listener);
+    return new DataReaderImpl(this, type, topic, qos, listener, use_amishare);
 }
 
 DataReader* SubscriberImpl::create_datareader(
         TopicDescription* topic,
         const DataReaderQos& qos,
         DataReaderListener* listener,
-        const StatusMask& mask)
+        const StatusMask& mask,
+        bool use_amishare)
 {
     logInfo(SUBSCRIBER, "CREATING SUBSCRIBER IN TOPIC: " << topic->get_name());
     //Look for the correct type registration
@@ -254,7 +256,7 @@ DataReader* SubscriberImpl::create_datareader(
 
     topic->get_impl()->reference();
 
-    DataReaderImpl* impl = create_datareader_impl(type_support, topic, qos, listener);
+    DataReaderImpl* impl = create_datareader_impl(type_support, topic, use_amishare, qos, listener);
     DataReader* reader = new DataReader(impl, mask);
     impl->user_datareader_ = reader;
 

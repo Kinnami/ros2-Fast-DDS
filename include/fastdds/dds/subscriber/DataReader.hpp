@@ -714,6 +714,10 @@ public:
      *
      * @return Any of the standard return codes.
      */
+    RTPS_DllAPI ReturnCode_t amishare_take_next_sample(
+            void* data,
+            SampleInfo* info);
+
     RTPS_DllAPI ReturnCode_t take_next_sample(
             void* data,
             SampleInfo* info);

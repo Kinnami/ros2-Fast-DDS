@@ -137,6 +137,9 @@ public:
      * @param data Pointer to the data
      * @return True if correct, false otherwise
      */
+    RTPS_DllAPI bool amishare_write(
+            void* data);
+
     RTPS_DllAPI bool write(
             void* data);
 

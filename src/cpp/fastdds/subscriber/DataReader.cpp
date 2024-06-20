@@ -47,7 +47,7 @@ DataReader::DataReader(
         DataReaderListener* listener,
         const StatusMask& mask)
     : DomainEntity(mask)
-    , impl_(s->create_datareader(topic, qos, listener, mask)->impl_)
+    , impl_(s->create_datareader(topic, qos, listener, false, mask)->impl_)
 {
 }
 
@@ -242,6 +242,13 @@ ReturnCode_t DataReader::take_next_sample(
         SampleInfo* info)
 {
     return impl_->take_next_sample(data, info);
+}
+
+ReturnCode_t DataReader::amishare_take_next_sample(
+        void* data,
+        SampleInfo* info)
+{
+    return impl_->amishare_take_next_sample(data, info);
 }
 
 ReturnCode_t DataReader::get_first_untaken_info(

@@ -55,6 +55,8 @@
 #include <rtps/participant/RTPSParticipantImpl.h>
 #include <rtps/RTPSDomainImpl.hpp>
 
+#include "BoxTSTObjectCreate.h"
+
 using namespace eprosima::fastrtps;
 using namespace eprosima::fastrtps::rtps;
 using namespace std::chrono;
@@ -133,7 +135,8 @@ DataWriterImpl::DataWriterImpl(
         TypeSupport type,
         Topic* topic,
         const DataWriterQos& qos,
-        DataWriterListener* listen)
+        DataWriterListener* listen,
+        bool use_amishare)
     : publisher_(p)
     , type_(type)
     , topic_(topic)
@@ -153,6 +156,13 @@ DataWriterImpl::DataWriterImpl(
     fastrtps::rtps::RTPSParticipantImpl::preprocess_endpoint_attributes<WRITER, 0x03, 0x02>(
         EntityId_t::unknown(), publisher_->get_participant_impl()->id_counter(), endpoint_attributes, guid_.entityId);
     guid_.guidPrefix = publisher_->get_participant_impl()->guid().guidPrefix;
+
+    if (use_amishare)
+    {
+        m_poObjectCreate = new void*;
+        *m_poObjectCreate = NULL;
+        object_create_init(m_poObjectCreate);
+    }
 }
 
 DataWriterImpl::DataWriterImpl(
@@ -530,6 +540,44 @@ bool DataWriterImpl::write(
 
     logInfo(DATA_WRITER, "Writing new data");
     return ReturnCode_t::RETCODE_OK == create_new_change(ALIVE, data);
+}
+
+bool DataWriterImpl::amishare_write(
+        void* data)
+{
+    PayloadInfo_t payload;
+    //bool was_loaned = check_and_remove_loan(data, payload);
+    //if (!was_loaned)
+    //{
+        if (!get_free_payload_from_pool(type_->getSerializedSizeProvider(data), payload))
+        {
+            return ReturnCode_t::RETCODE_OUT_OF_RESOURCES;
+        }
+
+        if (!type_->serialize(data, &payload.payload, data_representation_))
+        {
+            EPROSIMA_LOG_WARNING(DATA_WRITER, "Data serialization returned false");
+            return_payload_to_pool(payload);
+            return ReturnCode_t::RETCODE_ERROR;
+        }
+
+        unsigned char* buffer = payload.payload.data;
+        int length = payload.payload.length;
+        const char** args;
+        args = new const char*[3];
+        std::string file = "/" + getTopicName();
+        args[0] = file.c_str();
+        std::string buf(reinterpret_cast<char const*>(buffer), length);
+        args[1] = buf.c_str();
+        std::string len = std::to_string(length);
+        args[2] = len.c_str();
+        object_update(m_poObjectCreate, 3, args);
+        delete[] args;
+        return_payload_to_pool(payload);
+
+        create_new_change(ALIVE, data);
+    //}
+    return ReturnCode_t::RETCODE_OK;
 }
 
 bool DataWriterImpl::write(
@@ -2015,6 +2063,11 @@ bool DataWriterImpl::is_relevant(
     assert(reader_filters_);
     const DataWriterFilteredChange& writer_change = static_cast<const DataWriterFilteredChange&>(change);
     return writer_change.is_relevant_for(reader_guid);
+}
+
+std::string DataWriterImpl::getTopicName()
+{
+    return topic_->get_impl()->get_rtps_topic_name();
 }
 
 } // namespace dds

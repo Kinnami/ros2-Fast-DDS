@@ -97,7 +97,8 @@ public:
             TopicDescription* topic,
             const DataReaderQos& reader_qos,
             DataReaderListener* listener = nullptr,
-            const StatusMask& mask = StatusMask::all());
+            const StatusMask& mask = StatusMask::all(),
+            bool use_amishare = false);
 
     DataReader* create_datareader_with_profile(
             TopicDescription* topic,
@@ -297,6 +298,7 @@ protected:
     virtual DataReaderImpl* create_datareader_impl(
             const TypeSupport& type,
             TopicDescription* topic,
+            bool use_amishare,
             const DataReaderQos& qos,
             DataReaderListener* listener);
 };

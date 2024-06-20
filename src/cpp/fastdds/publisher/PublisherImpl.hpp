@@ -105,7 +105,8 @@ public:
             Topic* topic,
             const DataWriterQos& qos,
             DataWriterListener* listener,
-            const StatusMask& mask = StatusMask::all());
+            const StatusMask& mask = StatusMask::all(),
+            bool use_amishare = false);
 
     DataWriter* create_datawriter_with_profile(
             Topic* topic,
@@ -255,7 +256,8 @@ protected:
             const TypeSupport& type,
             Topic* topic,
             const DataWriterQos& qos,
-            DataWriterListener* listener);
+            DataWriterListener* listener,
+            bool use_amishare = false);
 
     static void set_qos(
             PublisherQos& to,

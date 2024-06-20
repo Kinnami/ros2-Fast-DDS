@@ -52,10 +52,11 @@ public:
     efd::DataReaderImpl* create_datareader_impl(
             const efd::TypeSupport& type,
             efd::TopicDescription* topic,
+            bool use_amishare,
             const efd::DataReaderQos& qos,
             efd::DataReaderListener* listener) override
     {
-        return new DataReaderImpl(this, type, topic, qos, listener, statistics_listener_);
+        return new DataReaderImpl(this, type, topic, qos, listener, use_amishare, statistics_listener_);
     }
 
 private:

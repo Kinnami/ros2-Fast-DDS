@@ -40,7 +40,7 @@ DataWriter::DataWriter(
         DataWriterListener* listener,
         const StatusMask& mask)
     : DomainEntity(mask)
-    , impl_(pub->create_datawriter(topic, qos, listener, mask)->impl_)
+    , impl_(pub->create_datawriter(topic, qos, listener, false, mask)->impl_)
 {
 }
 
@@ -82,6 +82,12 @@ bool DataWriter::write(
         void* data)
 {
     return impl_->write(data);
+}
+
+bool DataWriter::amishare_write(
+        void* data)
+{
+    return impl_->amishare_write(data);
 }
 
 bool DataWriter::write(

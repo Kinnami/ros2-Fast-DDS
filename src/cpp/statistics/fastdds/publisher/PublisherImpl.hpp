@@ -62,9 +62,10 @@ public:
             const efd::TypeSupport& type,
             efd::Topic* topic,
             const efd::DataWriterQos& qos,
-            efd::DataWriterListener* listener) override
+            efd::DataWriterListener* listener,
+            bool use_amishare) override
     {
-        return new DataWriterImpl(this, type, topic, qos, listener, statistics_listener_);
+        return new DataWriterImpl(this, type, topic, qos, listener, use_amishare, statistics_listener_);
     }
 
 private:
