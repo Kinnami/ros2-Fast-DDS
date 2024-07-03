@@ -18,11 +18,11 @@ bool AmiSharePublisher::create_publisher(void* type, std::string topic_name, std
     pqos.wire_protocol().builtin.discovery_config.leaseDuration = eprosima::fastrtps::c_TimeInfinite;
     pqos.name("test");
 
-    pqos.transport().use_builtin_transports = false;
-    auto shm_transport = std::make_shared<SharedMemTransportDescriptor>();
-    shm_transport->segment_size(10000);
-    shm_transport->max_message_size(10000);
-    pqos.transport().user_transports.push_back(shm_transport);
+    //pqos.transport().use_builtin_transports = false;
+    //auto shm_transport = std::make_shared<SharedMemTransportDescriptor>();
+    //shm_transport->segment_size(10000);
+    //shm_transport->max_message_size(10000);
+    //pqos.transport().user_transports.push_back(shm_transport);
     participant_ = DomainParticipantFactory::get_instance()->create_participant(0, pqos);
     if (participant_ == nullptr)
         return false;
