@@ -104,7 +104,9 @@ static void set_qos_from_attributes(
 PublisherImpl::PublisherImpl(
         DomainParticipantImpl* p,
         const PublisherQos& qos,
-        PublisherListener* listen)
+        PublisherListener* listen,
+        bool use_amishare,
+        void ** poObjectCreate)
     : participant_(p)
     , qos_(&qos == &PUBLISHER_QOS_DEFAULT ? participant_->get_default_publisher_qos() : qos)
     , listener_(listen)
@@ -112,6 +114,8 @@ PublisherImpl::PublisherImpl(
     , user_publisher_(nullptr)
     , rtps_participant_(p->rtps_participant())
     , default_datawriter_qos_(DATAWRITER_QOS_DEFAULT)
+    , m_use_amishare(use_amishare)
+    , m_poObjectCreate(poObjectCreate)
 {
     PublisherAttributes pub_attr;
     XMLProfileManager::getDefaultPublisherAttributes(pub_attr);
@@ -257,18 +261,16 @@ DataWriterImpl* PublisherImpl::create_datawriter_impl(
         const TypeSupport& type,
         Topic* topic,
         const DataWriterQos& qos,
-        DataWriterListener* listener,
-        bool use_amishare)
+        DataWriterListener* listener)
 {
-    return new DataWriterImpl(this, type, topic, qos, listener, use_amishare);
+    return new DataWriterImpl(this, type, topic, qos, listener, m_use_amishare, m_poObjectCreate);
 }
 
 DataWriter* PublisherImpl::create_datawriter(
         Topic* topic,
         const DataWriterQos& qos,
         DataWriterListener* listener,
-        const StatusMask& mask,
-        bool use_amishare)
+        const StatusMask& mask)
 {
     logInfo(PUBLISHER, "CREATING WRITER IN TOPIC: " << topic->get_name());
     //Look for the correct type registration
@@ -287,7 +289,7 @@ DataWriter* PublisherImpl::create_datawriter(
         return nullptr;
     }
 
-    DataWriterImpl* impl = create_datawriter_impl(type_support, topic, qos, listener, use_amishare);
+    DataWriterImpl* impl = create_datawriter_impl(type_support, topic, qos, listener);
     return create_datawriter(topic, impl, mask);
 }
 

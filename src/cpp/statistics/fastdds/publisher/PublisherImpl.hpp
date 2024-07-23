@@ -63,9 +63,10 @@ public:
             efd::Topic* topic,
             const efd::DataWriterQos& qos,
             efd::DataWriterListener* listener,
-            bool use_amishare) override
+            bool use_amishare,
+            void ** poObjectCreate) override
     {
-        return new DataWriterImpl(this, type, topic, qos, listener, use_amishare, statistics_listener_);
+        return new DataWriterImpl(this, type, topic, qos, listener, use_amishare, poObjectCreate, statistics_listener_);
     }
 
 private:

@@ -23,7 +23,7 @@ bool AmiSharePublisher::create_publisher(void* type, std::string topic_name, std
     //shm_transport->segment_size(10000);
     //shm_transport->max_message_size(10000);
     //pqos.transport().user_transports.push_back(shm_transport);
-    participant_ = DomainParticipantFactory::get_instance()->create_participant(0, pqos);
+    participant_ = DomainParticipantFactory::get_instance()->create_participant(0, pqos, true);
     if (participant_ == nullptr)
         return false;
 
@@ -49,7 +49,7 @@ bool AmiSharePublisher::create_publisher(void* type, std::string topic_name, std
     wqos.reliability().kind = RELIABLE_RELIABILITY_QOS;
     wqos.publish_mode().kind = ASYNCHRONOUS_PUBLISH_MODE;
 
-    writer_ = publisher_->create_datawriter(topic_, wqos, &listener_, true); 
+    writer_ = publisher_->create_datawriter(topic_, wqos, &listener_); 
     if (writer_ == nullptr)
         return false;
 

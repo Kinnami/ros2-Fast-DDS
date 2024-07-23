@@ -117,16 +117,6 @@ DataWriter* Publisher::create_datawriter(
     return impl_->create_datawriter(topic, qos, listener, mask);
 }
 
-DataWriter* Publisher::create_datawriter(
-        Topic* topic,
-        const DataWriterQos& qos,
-        DataWriterListener* listener,
-        bool use_amishare,
-        const StatusMask& mask)
-{
-    return impl_->create_datawriter(topic, qos, listener, mask, use_amishare);
-}
-
 DataWriter* Publisher::create_datawriter_with_profile(
         Topic* topic,
         const std::string& profile_name,

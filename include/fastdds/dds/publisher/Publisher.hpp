@@ -163,13 +163,6 @@ public:
             DataWriterListener* listener = nullptr,
             const StatusMask& mask = StatusMask::all());
 
-    RTPS_DllAPI DataWriter* create_datawriter(
-            Topic* topic,
-            const DataWriterQos& qos,
-            DataWriterListener* listener = nullptr,
-            bool use_amishare = false,
-            const StatusMask& mask = StatusMask::all());
-
     /**
      * This operation creates a DataWriter. The returned DataWriter will be attached and belongs to the Publisher.
      *

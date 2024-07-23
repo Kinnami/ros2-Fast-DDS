@@ -75,7 +75,9 @@ protected:
     SubscriberImpl(
             DomainParticipantImpl* p,
             const SubscriberQos& qos,
-            SubscriberListener* listen = nullptr);
+            SubscriberListener* listen = nullptr,
+            bool use_amishare = false,
+            void ** poObjectCreate = NULL);
 
 public:
 
@@ -97,8 +99,7 @@ public:
             TopicDescription* topic,
             const DataReaderQos& reader_qos,
             DataReaderListener* listener = nullptr,
-            const StatusMask& mask = StatusMask::all(),
-            bool use_amishare = false);
+            const StatusMask& mask = StatusMask::all());
 
     DataReader* create_datareader_with_profile(
             TopicDescription* topic,
@@ -295,10 +296,12 @@ protected:
 
     fastrtps::rtps::InstanceHandle_t handle_;
 
+    bool m_use_amishare;
+    void ** m_poObjectCreate;
+
     virtual DataReaderImpl* create_datareader_impl(
             const TypeSupport& type,
             TopicDescription* topic,
-            bool use_amishare,
             const DataReaderQos& qos,
             DataReaderListener* listener);
 };

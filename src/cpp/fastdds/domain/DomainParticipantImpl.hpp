@@ -85,7 +85,8 @@ protected:
             DomainParticipant* dp,
             DomainId_t did,
             const DomainParticipantQos& qos,
-            DomainParticipantListener* listen = nullptr);
+            DomainParticipantListener* listen = nullptr,
+            bool use_amishare = false);
 
     virtual ~DomainParticipantImpl();
 
@@ -471,6 +472,9 @@ protected:
 
     //!RTPSParticipant
     fastrtps::rtps::RTPSParticipant* rtps_participant_;
+
+    bool m_use_amishare;
+    void ** m_poObjectCreate;
 
     //!Participant*
     DomainParticipant* participant_;

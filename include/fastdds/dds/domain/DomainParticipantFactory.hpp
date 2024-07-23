@@ -68,6 +68,11 @@ public:
     RTPS_DllAPI DomainParticipant* create_participant(
             DomainId_t domain_id,
             const DomainParticipantQos& qos,
+            bool use_amishare);
+
+    RTPS_DllAPI DomainParticipant* create_participant(
+            DomainId_t domain_id,
+            const DomainParticipantQos& qos,
             DomainParticipantListener* listener = nullptr,
             const StatusMask& mask = StatusMask::all());
 

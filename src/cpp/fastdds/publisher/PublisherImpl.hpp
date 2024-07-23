@@ -78,7 +78,9 @@ protected:
     PublisherImpl(
             DomainParticipantImpl* p,
             const PublisherQos& qos,
-            PublisherListener* p_listen = nullptr);
+            PublisherListener* p_listen = nullptr,
+            bool use_amishare = false,
+            void ** poObjectCreate = NULL);
 
 public:
 
@@ -105,8 +107,7 @@ public:
             Topic* topic,
             const DataWriterQos& qos,
             DataWriterListener* listener,
-            const StatusMask& mask = StatusMask::all(),
-            bool use_amishare = false);
+            const StatusMask& mask = StatusMask::all());
 
     DataWriter* create_datawriter_with_profile(
             Topic* topic,
@@ -252,12 +253,15 @@ protected:
 
     fastrtps::rtps::InstanceHandle_t handle_;
 
+    bool m_use_amishare;
+    void ** m_poObjectCreate;
+
+
     virtual DataWriterImpl* create_datawriter_impl(
             const TypeSupport& type,
             Topic* topic,
             const DataWriterQos& qos,
-            DataWriterListener* listener,
-            bool use_amishare = false);
+            DataWriterListener* listener);
 
     static void set_qos(
             PublisherQos& to,

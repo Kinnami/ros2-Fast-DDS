@@ -61,6 +61,8 @@
 #include <rtps/RTPSDomainImpl.hpp>
 #include <utils/SystemInfo.hpp>
 
+#include "BoxTSTObjectCreate.h"
+
 namespace eprosima {
 namespace fastdds {
 namespace dds {
@@ -138,7 +140,8 @@ DomainParticipantImpl::DomainParticipantImpl(
         DomainParticipant* dp,
         DomainId_t did,
         const DomainParticipantQos& qos,
-        DomainParticipantListener* listen)
+        DomainParticipantListener* listen, 
+        bool use_amishare)
     : domain_id_(did)
     , next_instance_id_(0)
     , qos_(qos)
@@ -193,6 +196,16 @@ DomainParticipantImpl::DomainParticipantImpl(
     if (nullptr != property_value && property_value->empty())
     {
         property_value->assign(std::to_string(SystemInfo::instance().process_id()));
+    }
+
+    m_use_amishare = use_amishare;
+    std::cout << "TEBD: domain participant\n";
+    if (use_amishare)
+    {
+    std::cout << "TEBD: creating object in participant\n";
+        m_poObjectCreate = new void*;
+        *m_poObjectCreate = NULL;
+        object_create_init(m_poObjectCreate);
     }
 }
 
@@ -794,7 +807,8 @@ PublisherImpl* DomainParticipantImpl::create_publisher_impl(
         const PublisherQos& qos,
         PublisherListener* listener)
 {
-    return new PublisherImpl(this, qos, listener);
+std::cout << "TEBD: creating publisher\n";
+    return new PublisherImpl(this, qos, listener, m_use_amishare, m_poObjectCreate);
 }
 
 /* TODO
@@ -1276,7 +1290,8 @@ SubscriberImpl* DomainParticipantImpl::create_subscriber_impl(
         const SubscriberQos& qos,
         SubscriberListener* listener)
 {
-    return new SubscriberImpl(this, qos, listener);
+    std::cout << "TEBD: creating subscriber\n";
+    return new SubscriberImpl(this, qos, listener, m_use_amishare, m_poObjectCreate);
 }
 
 Topic* DomainParticipantImpl::create_topic(

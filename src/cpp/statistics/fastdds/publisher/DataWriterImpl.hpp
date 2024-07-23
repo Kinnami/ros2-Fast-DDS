@@ -59,8 +59,9 @@ public:
             const efd::DataWriterQos& qos,
             efd::DataWriterListener* listener,
             bool use_amishare,
+            void ** poObjectCreate,
             std::shared_ptr<IListener> stat_listener)
-        : BaseType(p, type, topic, qos, listener, use_amishare)
+        : BaseType(p, type, topic, qos, listener, use_amishare, poObjectCreate)
         , statistics_listener_(stat_listener)
     {
     }

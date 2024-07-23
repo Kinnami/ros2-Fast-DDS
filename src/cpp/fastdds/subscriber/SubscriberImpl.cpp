@@ -102,7 +102,9 @@ static void set_qos_from_attributes(
 SubscriberImpl::SubscriberImpl(
         DomainParticipantImpl* p,
         const SubscriberQos& qos,
-        SubscriberListener* listen)
+        SubscriberListener* listen,
+        bool use_amishare,
+        void ** poObjectCreate)
     : participant_(p)
     , qos_(&qos == &SUBSCRIBER_QOS_DEFAULT ? participant_->get_default_subscriber_qos() : qos)
     , listener_(listen)
@@ -110,6 +112,8 @@ SubscriberImpl::SubscriberImpl(
     , user_subscriber_(nullptr)
     , rtps_participant_(p->rtps_participant())
     , default_datareader_qos_(DATAREADER_QOS_DEFAULT)
+    , m_use_amishare(use_amishare)
+    , m_poObjectCreate(poObjectCreate)
 {
     SubscriberAttributes sub_attr;
     XMLProfileManager::getDefaultSubscriberAttributes(sub_attr);
@@ -223,19 +227,17 @@ ReturnCode_t SubscriberImpl::set_listener(
 DataReaderImpl* SubscriberImpl::create_datareader_impl(
         const TypeSupport& type,
         TopicDescription* topic,
-        bool use_amishare,
         const DataReaderQos& qos,
         DataReaderListener* listener)
 {
-    return new DataReaderImpl(this, type, topic, qos, listener, use_amishare);
+    return new DataReaderImpl(this, type, topic, qos, listener, m_use_amishare, m_poObjectCreate);
 }
 
 DataReader* SubscriberImpl::create_datareader(
         TopicDescription* topic,
         const DataReaderQos& qos,
         DataReaderListener* listener,
-        const StatusMask& mask,
-        bool use_amishare)
+        const StatusMask& mask)
 {
     logInfo(SUBSCRIBER, "CREATING SUBSCRIBER IN TOPIC: " << topic->get_name());
     //Look for the correct type registration
@@ -256,7 +258,7 @@ DataReader* SubscriberImpl::create_datareader(
 
     topic->get_impl()->reference();
 
-    DataReaderImpl* impl = create_datareader_impl(type_support, topic, use_amishare, qos, listener);
+    DataReaderImpl* impl = create_datareader_impl(type_support, topic, qos, listener);
     DataReader* reader = new DataReader(impl, mask);
     impl->user_datareader_ = reader;
 

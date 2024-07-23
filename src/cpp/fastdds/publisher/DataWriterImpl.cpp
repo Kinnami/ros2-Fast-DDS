@@ -136,7 +136,8 @@ DataWriterImpl::DataWriterImpl(
         Topic* topic,
         const DataWriterQos& qos,
         DataWriterListener* listen,
-        bool use_amishare)
+        bool use_amishare, 
+        void ** poObjectCreate)
     : publisher_(p)
     , type_(type)
     , topic_(topic)
@@ -159,9 +160,10 @@ DataWriterImpl::DataWriterImpl(
 
     if (use_amishare)
     {
-        m_poObjectCreate = new void*;
-        *m_poObjectCreate = NULL;
-        object_create_init(m_poObjectCreate);
+        //m_poObjectCreate = new void*;
+        //*m_poObjectCreate = NULL;
+        //object_create_init(m_poObjectCreate);
+        m_poObjectCreate = poObjectCreate;
     }
 }
 
@@ -551,7 +553,7 @@ bool DataWriterImpl::amishare_write(
     //{
         if (!get_free_payload_from_pool(type_->getSerializedSizeProvider(data), payload))
         {
-            return ReturnCode_t::RETCODE_OUT_OF_RESOURCES;
+            return ReturnCode_t::RETCODE_ERROR;
         }
 
         //if (!type_->serialize(data, &payload.payload, data_representation_))
@@ -576,7 +578,7 @@ bool DataWriterImpl::amishare_write(
         delete[] args;
         return_payload_to_pool(payload);
 
-        create_new_change(ALIVE, data);
+        //create_new_change(ALIVE, data);
     //}
     return ReturnCode_t::RETCODE_OK;
 }

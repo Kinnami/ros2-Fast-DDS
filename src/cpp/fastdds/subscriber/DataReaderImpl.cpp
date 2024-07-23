@@ -91,7 +91,8 @@ DataReaderImpl::DataReaderImpl(
         TopicDescription* topic,
         const DataReaderQos& qos,
         DataReaderListener* listener,
-        bool use_amishare)
+        bool use_amishare,
+        void ** poObjectCreate)
     : subscriber_(s)
     , type_(type)
     , topic_(topic)
@@ -116,9 +117,10 @@ DataReaderImpl::DataReaderImpl(
 
     if (use_amishare)
     {
-        m_poObjectCreate = new void*;
-        *m_poObjectCreate = NULL;
-        object_create_init(m_poObjectCreate);
+        m_poObjectCreate = poObjectCreate;
+        //m_poObjectCreate = new void*;
+        //*m_poObjectCreate = NULL;
+        //object_create_init(m_poObjectCreate);
     }
 }
 
@@ -716,6 +718,14 @@ ReturnCode_t DataReaderImpl::amishare_take_next_sample(
     unsigned char **datareturn;
     datareturn = new unsigned char*;
     int datareturnsize;
+
+    /*
+    std::cout << "Attempting object receive\n";
+    amishare_receive(m_poObjectCreate, datareturn, 100, &datareturnsize);
+    std::cout << "Amishare receive got " << *datareturn << "\n";
+    free(*datareturn);
+    std::cout << "Finished object receive\n";
+    */
 
     //take_next_sample(data, info, datareturn, datareturnsize);
     const char** args;

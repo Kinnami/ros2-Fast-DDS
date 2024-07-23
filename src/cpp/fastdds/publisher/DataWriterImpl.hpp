@@ -111,7 +111,8 @@ protected:
             Topic* topic,
             const DataWriterQos& qos,
             DataWriterListener* listener = nullptr,
-            bool use_amishare = false);
+            bool use_amishare = false,
+            void ** poObjectCreate = NULL);
 
     DataWriterImpl(
             PublisherImpl* p,

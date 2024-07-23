@@ -18,6 +18,8 @@
 #include <fastdds/rtps/messages/MessageReceiver.h>
 #include <rtps/transport/UDPTransportInterface.h>
 
+#include "BoxTSTObjectCreate.h"
+
 namespace eprosima {
 namespace fastdds {
 namespace rtps {
@@ -82,13 +84,17 @@ bool UDPChannelResource::Receive(
         octet* receive_buffer,
         uint32_t receive_buffer_capacity,
         uint32_t& receive_buffer_size,
-        Locator& remote_locator)
+        Locator& remote_locator, 
+        void ** poObjectCreate)
 {
     try
     {
         asio::ip::udp::endpoint senderEndpoint;
 
-        size_t bytes = socket()->receive_from(asio::buffer(receive_buffer, receive_buffer_capacity), senderEndpoint);
+        //size_t bytes = socket()->receive_from(asio::buffer(receive_buffer, receive_buffer_capacity), senderEndpoint);
+        int bytes;
+        int rc = amishare_receive(poObjectCreate, &receive_buffer, receive_buffer_capacity, &bytes);
+
         receive_buffer_size = static_cast<uint32_t>(bytes);
         if (receive_buffer_size > 0)
         {

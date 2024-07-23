@@ -213,6 +213,54 @@ ReturnCode_t DomainParticipantFactory::delete_participant(
 DomainParticipant* DomainParticipantFactory::create_participant(
         DomainId_t did,
         const DomainParticipantQos& qos,
+        bool use_amishare)
+{
+    DomainParticipantListener* listen = nullptr;
+    const StatusMask& mask = StatusMask::all();
+
+    load_profiles();
+
+    const DomainParticipantQos& pqos = (&qos == &PARTICIPANT_QOS_DEFAULT) ? default_participant_qos_ : qos;
+
+    DomainParticipant* dom_part = new DomainParticipant(mask);
+#ifndef FASTDDS_STATISTICS
+    DomainParticipantImpl* dom_part_impl = new DomainParticipantImpl(dom_part, did, pqos, listen, use_amishare);
+#else
+    eprosima::fastdds::statistics::dds::DomainParticipantImpl* dom_part_impl =
+            new eprosima::fastdds::statistics::dds::DomainParticipantImpl(dom_part, did, pqos, listen, use_amishare);
+#endif // FASTDDS_STATISTICS
+
+    {
+        std::lock_guard<std::mutex> guard(mtx_participants_);
+        using VectorIt = std::map<DomainId_t, std::vector<DomainParticipantImpl*>>::iterator;
+        VectorIt vector_it = participants_.find(did);
+
+        if (vector_it == participants_.end())
+        {
+            // Insert the vector
+            std::vector<DomainParticipantImpl*> new_vector;
+            auto pair_it = participants_.insert(std::make_pair(did, std::move(new_vector)));
+            vector_it = pair_it.first;
+        }
+
+        vector_it->second.push_back(dom_part_impl);
+    }
+
+    if (factory_qos_.entity_factory().autoenable_created_entities)
+    {
+        if (ReturnCode_t::RETCODE_OK != dom_part->enable())
+        {
+            delete_participant(dom_part);
+            return nullptr;
+        }
+    }
+
+    return dom_part;
+}
+
+DomainParticipant* DomainParticipantFactory::create_participant(
+        DomainId_t did,
+        const DomainParticipantQos& qos,
         DomainParticipantListener* listen,
         const StatusMask& mask)
 {

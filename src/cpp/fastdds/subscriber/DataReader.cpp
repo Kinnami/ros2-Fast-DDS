@@ -47,7 +47,7 @@ DataReader::DataReader(
         DataReaderListener* listener,
         const StatusMask& mask)
     : DomainEntity(mask)
-    , impl_(s->create_datareader(topic, qos, listener, false, mask)->impl_)
+    , impl_(s->create_datareader(topic, qos, listener, mask)->impl_)
 {
 }
 

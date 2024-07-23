@@ -170,13 +170,6 @@ public:
             DataReaderListener* listener = nullptr,
             const StatusMask& mask = StatusMask::all());
 
-    RTPS_DllAPI DataReader* create_datareader(
-            TopicDescription* topic,
-            const DataReaderQos& reader_qos,
-            DataReaderListener* listener = nullptr,
-            bool use_amishare = false,
-            const StatusMask& mask = StatusMask::all());
-
     /**
      * This operation creates a DataReader. The returned DataReader will be attached and belongs to the Subscriber.
      *
