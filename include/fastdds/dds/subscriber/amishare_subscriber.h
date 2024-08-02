@@ -1,5 +1,3 @@
-#include "BoxTSTObjectCreate.h"
-
 #include <fastdds/dds/domain/DomainParticipant.hpp>
 #include <fastdds/dds/domain/DomainParticipantFactory.hpp>
 #include <fastdds/rtps/transport/shared_mem/SharedMemTransportDescriptor.h>
@@ -8,6 +6,10 @@
 #include <fastdds/dds/subscriber/DataReaderListener.hpp>
 #include <fastdds/dds/topic/TypeSupport.hpp>
 #include <string>
+
+#if AMISHARE_ROS == 1
+#include "BoxTSTObjectCreate.h"
+#endif
 
 namespace eprosima {
 namespace fastdds {

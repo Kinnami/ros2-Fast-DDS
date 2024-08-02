@@ -459,7 +459,15 @@ target_compile_definitions(${PROJECT_NAME} PRIVATE
     $<$<BOOL:${STDOUTERR_LOG_CONSUMER}>:STDOUTERR_LOG_CONSUMER> # Enable StdoutErrConsumer as default LogConsumer
     )
 
-# Define public headers
+# No need to expose linked libs when target is a shared library on MSVC.
+if(BUILD_SHARED_LIBS AND MSVC)
+    set(PRIVACY "PRIVATE")
+else()
+    set(PRIVACY "PUBLIC")
+endif()
+
+if($ENV{USE_AMISHARE_ROS} EQUAL 1)
+add_compile_definitions(AMISHARE_ROS=1)
 target_include_directories(${PROJECT_NAME} PUBLIC
     $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>
     $<BUILD_INTERFACE:${PROJECT_BINARY_DIR}/include>
@@ -474,15 +482,6 @@ target_include_directories(${PROJECT_NAME} PUBLIC
     ${PROJECT_SOURCE_DIR}/thirdparty/taocpp-pegtl
     $ENV{AMISHARE_BASE}/ReplicatingPeer/src/objc/libBoxOSStore/TST
     )
-
-# No need to expose linked libs when target is a shared library on MSVC.
-if(BUILD_SHARED_LIBS AND MSVC)
-    set(PRIVACY "PRIVATE")
-else()
-    set(PRIVACY "PUBLIC")
-endif()
-
-# Link library to external libraries.
 target_link_libraries(${PROJECT_NAME} ${PRIVACY} fastcdr foonathan_memory
     ${CMAKE_THREAD_LIBS_INIT} ${CMAKE_DL_LIBS}
     ${TINYXML2_LIBRARY}
@@ -492,6 +491,31 @@ target_link_libraries(${PROJECT_NAME} ${PRIVACY} fastcdr foonathan_memory
     PRIVATE eProsima_atomic
     $ENV{AMISHARE_BASE}/lib/$ENV{AMISHARE_TARGET}/$ENV{AMISHARE_TARGET_BINARY}/libBoxOSStoreOBC.so.0
     )
+else()
+# Define public headers
+target_include_directories(${PROJECT_NAME} PUBLIC
+    $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>
+    $<BUILD_INTERFACE:${PROJECT_BINARY_DIR}/include>
+    $<BUILD_INTERFACE:${PROJECT_BINARY_DIR}/include/${PROJECT_NAME}>
+    $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/src/cpp>
+    $<INSTALL_INTERFACE:${INCLUDE_INSTALL_DIR}>
+    PRIVATE
+    ${Asio_INCLUDE_DIR}
+    $<$<BOOL:${TINYXML2_INCLUDE_DIR}>:${TINYXML2_INCLUDE_DIR}>
+    $<$<BOOL:${ANDROID}>:${ANDROID_IFADDRS_INCLUDE_DIR}>
+    ${THIRDPARTY_BOOST_INCLUDE_DIR}
+    ${PROJECT_SOURCE_DIR}/thirdparty/taocpp-pegtl
+    )
+# Link library to external libraries.
+target_link_libraries(${PROJECT_NAME} ${PRIVACY} fastcdr foonathan_memory
+    ${CMAKE_THREAD_LIBS_INIT} ${CMAKE_DL_LIBS}
+    ${TINYXML2_LIBRARY}
+    $<$<BOOL:${LINK_SSL}>:OpenSSL::SSL$<SEMICOLON>OpenSSL::Crypto$<$<BOOL:${WIN32}>:$<SEMICOLON>crypt32.lib>>
+    $<$<BOOL:${WIN32}>:iphlpapi$<SEMICOLON>Shlwapi>
+    ${THIRDPARTY_BOOST_LINK_LIBS}
+    PRIVATE eProsima_atomic
+    )
+endif()
 
 if(MSVC OR MSVC_IDE)
     # On installed binaries use manifest to specify dependencies

@@ -53,6 +53,10 @@
 #include <rtps/history/TopicPayloadPoolRegistry.hpp>
 #include <rtps/participant/RTPSParticipantImpl.h>
 
+#if AMISHARE_ROS == 1
+#include "BoxTSTObjectCreate.h"
+#endif
+
 using namespace eprosima::fastrtps;
 using namespace eprosima::fastrtps::rtps;
 using namespace std::chrono;
@@ -118,7 +122,9 @@ DataReaderImpl::DataReaderImpl(
     {
         m_poObjectCreate = new void*;
         *m_poObjectCreate = NULL;
+#if AMISHARE_ROS == 1
         object_create_init(m_poObjectCreate);
+#endif
     }
 }
 
@@ -722,7 +728,9 @@ ReturnCode_t DataReaderImpl::amishare_take_next_sample(
     args = new const char*[1];
     std::string file = "/" + getTopicName();
     args[0] = file.c_str();
+#if AMISHARE_ROS == 1
     object_read(m_poObjectCreate, 1, args, datareturn, &datareturnsize);
+#endif
     delete[] args;
 
     // somehow put datareturn into a payload buffer...
@@ -735,7 +743,7 @@ ReturnCode_t DataReaderImpl::amishare_take_next_sample(
     std::cout << "TEBD: object read got " << str << "\n";
     type_->deserialize(&payload, data);
 
-    //free(*datareturn);
+    // free(*datareturn); // this is apparently not necessary because it causes a double free
     delete datareturn;
     return ReturnCode_t::RETCODE_OK;
 }

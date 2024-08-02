@@ -47,8 +47,6 @@
 
 #include <fastdds/subscriber/history/DataReaderHistory.hpp>
 
-#include "BoxTSTObjectCreate.h"
-
 using eprosima::fastrtps::types::ReturnCode_t;
 
 namespace eprosima {

@@ -55,7 +55,9 @@
 #include <rtps/participant/RTPSParticipantImpl.h>
 #include <rtps/RTPSDomainImpl.hpp>
 
+#if AMISHARE_ROS == 1
 #include "BoxTSTObjectCreate.h"
+#endif
 
 using namespace eprosima::fastrtps;
 using namespace eprosima::fastrtps::rtps;
@@ -161,7 +163,9 @@ DataWriterImpl::DataWriterImpl(
     {
         m_poObjectCreate = new void*;
         *m_poObjectCreate = NULL;
+#if AMISHARE_ROS == 1
         object_create_init(m_poObjectCreate);
+#endif
     }
 }
 
@@ -572,7 +576,9 @@ bool DataWriterImpl::amishare_write(
         args[1] = buf.c_str();
         std::string len = std::to_string(length);
         args[2] = len.c_str();
+#if AMISHARE_ROS == 1
         object_update(m_poObjectCreate, 3, args);
+#endif
         delete[] args;
         return_payload_to_pool(payload);
 
