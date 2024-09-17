@@ -234,13 +234,15 @@ protected:
             const Locator& locator,
             TransportReceiverInterface* receiver,
             bool is_multicast,
-            uint32_t maxMsgSize);
+            uint32_t maxMsgSize,
+            void ** poObjectCreate = NULL);
     UDPChannelResource* CreateInputChannelResource(
             const std::string& sInterface,
             const Locator& locator,
             bool is_multicast,
             uint32_t maxMsgSize,
-            TransportReceiverInterface* receiver);
+            TransportReceiverInterface* receiver,
+            void ** poObjectCreate = NULL);
     virtual eProsimaUDPSocket OpenAndBindInputSocket(
             const std::string& sIp,
             uint16_t port,

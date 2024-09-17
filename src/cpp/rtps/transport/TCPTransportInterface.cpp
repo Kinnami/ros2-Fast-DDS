@@ -846,7 +846,7 @@ bool TCPTransportInterface::OpenOutputChannel(
 bool TCPTransportInterface::OpenInputChannel(
         const Locator& locator,
         TransportReceiverInterface* receiver,
-        uint32_t /*maxMsgSize*/)
+        uint32_t /*maxMsgSize*/, void**)
 {
     bool success = false;
     if (IsLocatorSupported(locator))

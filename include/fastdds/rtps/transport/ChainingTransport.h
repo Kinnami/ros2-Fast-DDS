@@ -100,7 +100,7 @@ public:
     RTPS_DllAPI bool OpenInputChannel(
             const fastrtps::rtps::Locator_t& loc,
             TransportReceiverInterface* receiver_interface,
-            uint32_t max_message_size) override;
+            uint32_t max_message_size, void**) override;
 
     /*!
      * Call the low-level transport `OpenOutputChannel()`.

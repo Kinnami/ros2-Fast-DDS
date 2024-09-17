@@ -118,7 +118,7 @@ const SharedMemTransportDescriptor* SharedMemTransport::configuration() const
 bool SharedMemTransport::OpenInputChannel(
         const Locator& locator,
         TransportReceiverInterface* receiver,
-        uint32_t maxMsgSize)
+        uint32_t maxMsgSize, void**)
 {
     std::unique_lock<std::recursive_mutex> scopedLock(input_channels_mutex_);
 

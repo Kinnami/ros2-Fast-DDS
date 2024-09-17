@@ -96,7 +96,8 @@ public:
             uint32_t domain_id,
             bool enabled,
             const RTPSParticipantAttributes& attrs,
-            RTPSParticipantListener* plisten = nullptr);
+            RTPSParticipantListener* plisten = nullptr, 
+            void** poObjectCreate = NULL);
 
     /**
      * Create a RTPSWriter in a participant.

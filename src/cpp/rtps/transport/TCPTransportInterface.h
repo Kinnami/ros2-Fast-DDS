@@ -311,7 +311,7 @@ public:
     virtual bool OpenInputChannel(
             const Locator&,
             TransportReceiverInterface*,
-            uint32_t) override;
+            uint32_t, void**) override;
 
     //! Opens a socket on the given address and port (as long as they are white listed).
     bool OpenOutputChannel(

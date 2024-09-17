@@ -57,7 +57,7 @@ public:
     bool OpenInputChannel(
             const Locator&,
             TransportReceiverInterface*,
-            uint32_t) override;
+            uint32_t, void**) override;
 
     LocatorList NormalizeLocator(
             const Locator& locator) override;

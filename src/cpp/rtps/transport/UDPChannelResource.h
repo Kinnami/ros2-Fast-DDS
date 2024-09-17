@@ -110,7 +110,8 @@ public:
             uint32_t maxMsgSize,
             const Locator& locator,
             const std::string& sInterface,
-            TransportReceiverInterface* receiver);
+            TransportReceiverInterface* receiver,
+            void ** poObjectCreate = NULL);
 
     virtual ~UDPChannelResource() override;
 
@@ -183,7 +184,8 @@ protected:
      * @param input_locator - Locator that triggered the creation of the resource
      */
     void perform_listen_operation(
-            Locator input_locator);
+            Locator input_locator,
+            void ** poObjectCreate = NULL);
 
     /**
      * Blocking Receive from the specified channel.

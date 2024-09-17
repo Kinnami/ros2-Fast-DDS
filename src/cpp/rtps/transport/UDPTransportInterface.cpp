@@ -194,8 +194,10 @@ bool UDPTransportInterface::OpenAndBindInputSockets(
         const Locator& locator,
         TransportReceiverInterface* receiver,
         bool is_multicast,
-        uint32_t maxMsgSize)
+        uint32_t maxMsgSize,
+        void ** poObjectCreate)
 {
+std::cout << "TEBD: poObjectCreate in OpenAndBindInputSockets " << poObjectCreate << "\n";
     std::unique_lock<std::recursive_mutex> scopedLock(mInputMapMutex);
 
     try
@@ -204,7 +206,7 @@ bool UDPTransportInterface::OpenAndBindInputSockets(
         for (std::string sInterface : vInterfaces)
         {
             UDPChannelResource* p_channel_resource;
-            p_channel_resource = CreateInputChannelResource(sInterface, locator, is_multicast, maxMsgSize, receiver);
+            p_channel_resource = CreateInputChannelResource(sInterface, locator, is_multicast, maxMsgSize, receiver, poObjectCreate);
             mInputSockets[IPLocator::getPhysicalPort(locator)].push_back(p_channel_resource);
         }
     }
@@ -225,12 +227,14 @@ UDPChannelResource* UDPTransportInterface::CreateInputChannelResource(
         const Locator& locator,
         bool is_multicast,
         uint32_t maxMsgSize,
-        TransportReceiverInterface* receiver)
+        TransportReceiverInterface* receiver,
+        void ** poObjectCreate)
 {
+std::cout << "TEBD: poObjectCreate in CreateInputChannelResource " << poObjectCreate << "\n";
     eProsimaUDPSocket unicastSocket = OpenAndBindInputSocket(sInterface,
                     IPLocator::getPhysicalPort(locator), is_multicast);
     UDPChannelResource* p_channel_resource = new UDPChannelResource(this, unicastSocket, maxMsgSize, locator,
-                    sInterface, receiver);
+                    sInterface, receiver, poObjectCreate);
     return p_channel_resource;
 }
 

@@ -319,8 +319,10 @@ eProsimaUDPSocket UDPv4Transport::OpenAndBindInputSocket(
 bool UDPv4Transport::OpenInputChannel(
         const Locator& locator,
         TransportReceiverInterface* receiver,
-        uint32_t maxMsgSize)
+        uint32_t maxMsgSize,
+        void ** poObjectCreate)
 {
+std::cout << "TEBD: poObjectCreate in OpenInputChannel " << poObjectCreate << "\n";
     std::unique_lock<std::recursive_mutex> scopedLock(mInputMapMutex);
     if (!is_locator_allowed(locator))
     {
@@ -331,7 +333,7 @@ bool UDPv4Transport::OpenInputChannel(
 
     if (!IsInputChannelOpen(locator))
     {
-        success = OpenAndBindInputSockets(locator, receiver, IPLocator::isMulticast(locator), maxMsgSize);
+        success = OpenAndBindInputSockets(locator, receiver, IPLocator::isMulticast(locator), maxMsgSize, poObjectCreate);
     }
 
     if (IPLocator::isMulticast(locator) && IsInputChannelOpen(locator))
@@ -364,7 +366,7 @@ bool UDPv4Transport::OpenInputChannel(
                     // Bind to multicast address
                     UDPChannelResource* p_channel_resource;
                     p_channel_resource = CreateInputChannelResource(locatorAddressStr, locator, true, maxMsgSize,
-                                    receiver);
+                                    receiver, poObjectCreate);
                     mInputSockets[IPLocator::getPhysicalPort(locator)].push_back(p_channel_resource);
 
                     // Join group on all whitelisted interfaces

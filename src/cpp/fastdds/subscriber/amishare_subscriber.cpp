@@ -27,6 +27,7 @@ bool AmiShareSubscriber::create_subscriber(void* message_value, void* type, std:
     //shm_transport->segment_size(10000);
     //shm_transport->max_message_size(10000);
     //pqos.transport().user_transports.push_back(shm_transport);
+    std::cout << "Making amishare participant\n";
     participant_ = DomainParticipantFactory::get_instance()->create_participant(0, pqos, true);
     if (participant_ == nullptr)
         return false;

@@ -100,7 +100,8 @@ RTPSParticipant* RTPSDomain::createParticipant(
         uint32_t domain_id,
         bool enabled,
         const RTPSParticipantAttributes& attrs,
-        RTPSParticipantListener* listen)
+        RTPSParticipantListener* listen, 
+        void** poObjectCreate)
 {
     logInfo(RTPS_PARTICIPANT, "");
 
@@ -160,11 +161,11 @@ RTPSParticipant* RTPSDomain::createParticipant(
     // would ensure builtin endpoints are able to differentiate between a communication loss and a participant recovery
     if (PParam.prefix != c_GuidPrefix_Unknown)
     {
-        pimpl = new RTPSParticipantImpl(domain_id, PParam, PParam.prefix, guidP, p, listen);
+        pimpl = new RTPSParticipantImpl(domain_id, PParam, PParam.prefix, guidP, p, listen, poObjectCreate);
     }
     else
     {
-        pimpl = new RTPSParticipantImpl(domain_id, PParam, guidP, p, listen);
+        pimpl = new RTPSParticipantImpl(domain_id, PParam, guidP, p, listen, poObjectCreate);
     }
 
     // Check implementation was correctly initialized

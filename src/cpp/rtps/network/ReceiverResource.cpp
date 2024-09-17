@@ -29,7 +29,8 @@ namespace rtps {
 ReceiverResource::ReceiverResource(
         TransportInterface& transport,
         const Locator_t& locator,
-        uint32_t max_recv_buffer_size)
+        uint32_t max_recv_buffer_size,
+        void ** poObjectCreate)
     : Cleanup(nullptr)
     , LocatorMapsToManagedChannel(nullptr)
     , mValid(false)
@@ -37,8 +38,9 @@ ReceiverResource::ReceiverResource(
     , receiver(nullptr)
     , max_message_size_(max_recv_buffer_size)
 {
+std::cout << "TEBD: poObjectCreate in ReceiverResource " << poObjectCreate << "\n";
     // Internal channel is opened and assigned to this resource.
-    mValid = transport.OpenInputChannel(locator, this, max_message_size_);
+    mValid = transport.OpenInputChannel(locator, this, max_message_size_, poObjectCreate);
     if (!mValid)
     {
         return; // Invalid resource to be discarded by the factory.

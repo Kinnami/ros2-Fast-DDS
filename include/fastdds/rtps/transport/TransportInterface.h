@@ -140,7 +140,7 @@ public:
     virtual bool OpenInputChannel(
             const Locator&,
             TransportReceiverInterface*,
-            uint32_t) = 0;
+            uint32_t, void**) = 0;
 
     /**
      * Must close the channel that maps to/from the given locator.

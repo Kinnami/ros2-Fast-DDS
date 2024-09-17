@@ -324,7 +324,7 @@ eProsimaUDPSocket UDPv6Transport::OpenAndBindInputSocket(
 bool UDPv6Transport::OpenInputChannel(
         const Locator& locator,
         TransportReceiverInterface* receiver,
-        uint32_t maxMsgSize)
+        uint32_t maxMsgSize, void**)
 {
     std::unique_lock<std::recursive_mutex> scopedLock(mInputMapMutex);
     if (!is_locator_allowed(locator))

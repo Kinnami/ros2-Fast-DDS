@@ -156,7 +156,8 @@ RTPSParticipantImpl::RTPSParticipantImpl(
         const GuidPrefix_t& guidP,
         const GuidPrefix_t& persistence_guid,
         RTPSParticipant* par,
-        RTPSParticipantListener* plisten)
+        RTPSParticipantListener* plisten,
+        void ** poObjectCreate)
     : domain_id_(domain_id)
     , m_att(PParam)
     , m_guid(guidP, c_EntityId_RTPSParticipant)
@@ -175,6 +176,7 @@ RTPSParticipantImpl::RTPSParticipantImpl(
     , mp_mutex(new std::recursive_mutex())
     , is_intraprocess_only_(should_be_intraprocess_only(PParam))
     , has_shm_transport_(false)
+    , m_poObjectCreate(poObjectCreate)
 {
     if (c_GuidPrefix_Unknown != persistence_guid)
     {
@@ -498,8 +500,8 @@ RTPSParticipantImpl::RTPSParticipantImpl(
         const RTPSParticipantAttributes& PParam,
         const GuidPrefix_t& guidP,
         RTPSParticipant* par,
-        RTPSParticipantListener* plisten)
-    : RTPSParticipantImpl(domain_id, PParam, guidP, c_GuidPrefix_Unknown, par, plisten)
+        RTPSParticipantListener* plisten, void** poObjectCreate)
+    : RTPSParticipantImpl(domain_id, PParam, guidP, c_GuidPrefix_Unknown, par, plisten, poObjectCreate)
 {
 }
 
@@ -1715,6 +1717,7 @@ bool RTPSParticipantImpl::createReceiverResources(
         bool RegisterReceiver,
         bool log_when_creation_fails)
 {
+std::cout << "TEBD: poObjectCreate in createReceiverResources " << m_poObjectCreate << "\n";
     std::vector<std::shared_ptr<ReceiverResource>> newItemsBuffer;
     bool ret_val = Locator_list.empty();
 
@@ -1729,7 +1732,7 @@ bool RTPSParticipantImpl::createReceiverResources(
 
     for (auto it_loc = Locator_list.begin(); it_loc != Locator_list.end(); ++it_loc)
     {
-        bool ret = m_network_Factory.BuildReceiverResources(*it_loc, newItemsBuffer, max_receiver_buffer_size);
+        bool ret = m_network_Factory.BuildReceiverResources(*it_loc, newItemsBuffer, max_receiver_buffer_size, m_poObjectCreate);
         if (!ret && ApplyMutation)
         {
             uint32_t tries = 0;
@@ -1737,7 +1740,7 @@ bool RTPSParticipantImpl::createReceiverResources(
             {
                 tries++;
                 applyLocatorAdaptRule(*it_loc);
-                ret = m_network_Factory.BuildReceiverResources(*it_loc, newItemsBuffer, max_receiver_buffer_size);
+                ret = m_network_Factory.BuildReceiverResources(*it_loc, newItemsBuffer, max_receiver_buffer_size, m_poObjectCreate);
             }
         }
 

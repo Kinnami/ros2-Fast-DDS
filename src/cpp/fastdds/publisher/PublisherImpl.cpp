@@ -115,8 +115,10 @@ PublisherImpl::PublisherImpl(
     , rtps_participant_(p->rtps_participant())
     , default_datawriter_qos_(DATAWRITER_QOS_DEFAULT)
     , m_use_amishare(use_amishare)
-    , m_poObjectCreate(poObjectCreate)
 {
+std::cout << "Creating publisher\n";
+    if (use_amishare)
+        m_poObjectCreate = poObjectCreate;
     PublisherAttributes pub_attr;
     XMLProfileManager::getDefaultPublisherAttributes(pub_attr);
     set_qos_from_attributes(default_datawriter_qos_, pub_attr);

@@ -33,7 +33,8 @@ UDPChannelResource::UDPChannelResource(
         uint32_t maxMsgSize,
         const Locator& locator,
         const std::string& sInterface,
-        TransportReceiverInterface* receiver)
+        TransportReceiverInterface* receiver,
+        void ** poObjectCreate)
     : ChannelResource(maxMsgSize)
     , message_receiver_(receiver)
     , socket_(moveSocket(socket))
@@ -41,7 +42,8 @@ UDPChannelResource::UDPChannelResource(
     , interface_(sInterface)
     , transport_(transport)
 {
-    thread(std::thread(&UDPChannelResource::perform_listen_operation, this, locator));
+    std::cout << "TEBD: poObjectCreate " << poObjectCreate << "\n";
+    thread(std::thread(&UDPChannelResource::perform_listen_operation, this, locator, poObjectCreate));
 }
 
 UDPChannelResource::~UDPChannelResource()
@@ -53,7 +55,8 @@ UDPChannelResource::~UDPChannelResource()
 }
 
 void UDPChannelResource::perform_listen_operation(
-        Locator input_locator)
+        Locator input_locator, 
+        void ** poObjectCreate)
 {
     Locator remote_locator;
 
@@ -61,7 +64,7 @@ void UDPChannelResource::perform_listen_operation(
     {
         // Blocking receive.
         auto& msg = message_buffer();
-        if (!Receive(msg.buffer, msg.max_size, msg.length, remote_locator))
+        if (!Receive(msg.buffer, msg.max_size, msg.length, remote_locator, poObjectCreate))
         {
             continue;
         }
@@ -91,13 +94,21 @@ bool UDPChannelResource::Receive(
     {
         asio::ip::udp::endpoint senderEndpoint;
 
-        //size_t bytes = socket()->receive_from(asio::buffer(receive_buffer, receive_buffer_capacity), senderEndpoint);
         int bytes;
-        int rc = amishare_receive(poObjectCreate, &receive_buffer, receive_buffer_capacity, &bytes);
+        //std::cout << "TEBD: poObjectCreate " << poObjectCreate << "\n";
+        if (poObjectCreate != NULL && *poObjectCreate != NULL)
+        {
+            int rc = amishare_receive(poObjectCreate, &receive_buffer, receive_buffer_capacity, &bytes);
+            std::cout << "TEBD: amishare receive got " << receive_buffer << "\n";
+        }
+        else
+            bytes = socket()->receive_from(asio::buffer(receive_buffer, receive_buffer_capacity), senderEndpoint);
 
         receive_buffer_size = static_cast<uint32_t>(bytes);
         if (receive_buffer_size > 0)
         {
+            if (poObjectCreate != NULL && *poObjectCreate != NULL)
+                std::cout << "Got an amishare object " << receive_buffer << "\n";
             // This is not necessary anymore but it's left here for back compatibility with versions older than 1.8.1
             if (receive_buffer_size == 13 && memcmp(receive_buffer, "EPRORTPSCLOSE", 13) == 0)
             {

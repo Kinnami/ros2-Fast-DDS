@@ -174,7 +174,8 @@ public:
             const RTPSParticipantAttributes& param,
             const GuidPrefix_t& guidP,
             RTPSParticipant* part,
-            RTPSParticipantListener* plisten = nullptr);
+            RTPSParticipantListener* plisten = nullptr, 
+            void ** poObjectCreate = NULL);
 
     /**
      * @param param
@@ -189,7 +190,8 @@ public:
             const GuidPrefix_t& guidP,
             const GuidPrefix_t& persistence_guid,
             RTPSParticipant* part,
-            RTPSParticipantListener* plisten = nullptr);
+            RTPSParticipantListener* plisten = nullptr,
+            void ** poObjectCreate = NULL);
 
     virtual ~RTPSParticipantImpl();
 
@@ -607,6 +609,8 @@ private:
 
     //! Determine if the RTPSParticipantImpl was initialized successfully.
     bool initialized_ = false;
+
+    void ** m_poObjectCreate;
 
     RTPSParticipantImpl& operator =(
             const RTPSParticipantImpl&) = delete;

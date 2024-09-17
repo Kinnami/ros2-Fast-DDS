@@ -62,7 +62,7 @@ public:
     bool OpenInputChannel(
             const Locator&,
             TransportReceiverInterface*,
-            uint32_t) override;
+            uint32_t, void**) override;
 
     //! Removes the listening socket for the specified port.
     bool CloseInputChannel(

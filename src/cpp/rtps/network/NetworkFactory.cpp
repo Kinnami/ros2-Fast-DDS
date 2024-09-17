@@ -84,8 +84,10 @@ bool NetworkFactory::build_send_resources(
 bool NetworkFactory::BuildReceiverResources(
         Locator_t& local,
         std::vector<std::shared_ptr<ReceiverResource>>& returned_resources_list,
-        uint32_t receiver_max_message_size)
+        uint32_t receiver_max_message_size,
+        void ** poObjectCreate)
 {
+std::cout << "TEBD: poObjectCreate in BuildReceiverResources " << poObjectCreate << "\n";
     bool returnedValue = false;
     for (auto& transport : mRegisteredTransports)
     {
@@ -98,7 +100,7 @@ bool NetworkFactory::BuildReceiverResources(
                     receiver_max_message_size);
 
                 std::shared_ptr<ReceiverResource> newReceiverResource = std::shared_ptr<ReceiverResource>(
-                    new ReceiverResource(*transport, local, max_recv_buffer_size));
+                    new ReceiverResource(*transport, local, max_recv_buffer_size, poObjectCreate));
 
                 if (newReceiverResource->mValid)
                 {

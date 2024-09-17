@@ -314,7 +314,7 @@ ReturnCode_t DomainParticipantImpl::enable()
 
     if (part == nullptr)
     {
-        part = RTPSDomain::createParticipant(domain_id_, false, rtps_attr, &rtps_listener_);
+        part = RTPSDomain::createParticipant(domain_id_, false, rtps_attr, &rtps_listener_, m_poObjectCreate);
 
         if (part == nullptr)
         {

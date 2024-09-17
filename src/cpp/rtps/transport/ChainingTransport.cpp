@@ -23,7 +23,7 @@ namespace rtps {
 bool ChainingTransport::OpenInputChannel(
         const fastrtps::rtps::Locator_t& loc,
         TransportReceiverInterface* receiver_interface,
-        uint32_t max_message_size)
+        uint32_t max_message_size, void**)
 {
     auto iterator = receiver_resources_.find(loc);
 
@@ -31,7 +31,7 @@ bool ChainingTransport::OpenInputChannel(
     {
         ChainingReceiverResource* receiver_resource = new ChainingReceiverResource(*this, receiver_interface);
         receiver_resources_.emplace(loc, receiver_resource);
-        return low_level_transport_->OpenInputChannel(loc, receiver_resource, max_message_size);
+        return low_level_transport_->OpenInputChannel(loc, receiver_resource, max_message_size, NULL);
     }
 
     return true;
