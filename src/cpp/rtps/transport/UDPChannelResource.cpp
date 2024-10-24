@@ -68,6 +68,8 @@ void UDPChannelResource::perform_listen_operation(
         {
             continue;
         }
+        if (poObjectCreate != NULL)
+            std::cout << "TEBD: message received: " << msg.buffer << "\n";
 
         // Processes the data through the CDR Message interface.
         if (message_receiver() != nullptr)
@@ -99,7 +101,8 @@ bool UDPChannelResource::Receive(
         if (poObjectCreate != NULL && *poObjectCreate != NULL)
         {
             int rc = amishare_receive(poObjectCreate, &receive_buffer, receive_buffer_capacity, &bytes);
-            std::cout << "TEBD: amishare receive got " << receive_buffer << "\n";
+            if (bytes > 0)
+                std::cout << "TEBD: amishare receive got " << receive_buffer << "\n";
         }
         else
             bytes = socket()->receive_from(asio::buffer(receive_buffer, receive_buffer_capacity), senderEndpoint);

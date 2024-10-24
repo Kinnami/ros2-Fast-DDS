@@ -578,7 +578,7 @@ bool DataWriterImpl::amishare_write(
         delete[] args;
         return_payload_to_pool(payload);
 
-        //create_new_change(ALIVE, data);
+        create_new_change(ALIVE, data);
     //}
     return ReturnCode_t::RETCODE_OK;
 }
